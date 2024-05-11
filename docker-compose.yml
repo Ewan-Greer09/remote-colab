@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    hostname: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+
+  # db:
+  #   image: mysql:latest
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: user_db
+  #   volumes:
+  #     - ./data:/var/lib/mysql
+  #     - ./repository/mysql/schema.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - 3306:3306
