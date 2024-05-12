@@ -1,3 +1,5 @@
 bin
 tmp
 *_templ.go
+
+node_modules
