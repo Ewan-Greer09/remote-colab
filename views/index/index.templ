@@ -9,6 +9,7 @@ templ Page() {
 			<title>Home</title>
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 			<script src="https://cdn.tailwindcss.com"></script>
+			<link rel="stylesheet" href="/public/css/index.css"/>
 		</head>
 		<body>
 			<div hx-get="/index/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>

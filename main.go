@@ -20,7 +20,6 @@ type Service struct {
 }
 
 func main() {
-	// ...
 	s := server.NewServer(":3000", server.NewHandler())
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
