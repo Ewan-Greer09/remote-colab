@@ -30,21 +30,19 @@ func NewHandler() http.HandlerFunc {
 	r := chi.NewMux()
 
 	r.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
-		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		MaxAge:           300,
 	}))
 
 	r.Get("/", handlers.HandleRoot)
 	r.Get("/index/content", handlers.HandleRootContent)
 
 	// Serve static files
-	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
+	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))
 
 	return r.ServeHTTP
 }
