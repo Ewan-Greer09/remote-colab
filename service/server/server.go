@@ -28,15 +28,7 @@ func NewServer(addr string, handler http.Handler) *Server {
 
 func NewHandler() http.HandlerFunc {
 	r := chi.NewMux()
-
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
+	r.Use(cors.AllowAll().Handler)
 
 	r.Get("/", handlers.HandleRoot)
 	r.Get("/index/content", handlers.HandleRootContent)
