@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 
@@ -21,7 +22,15 @@ func (h *Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ChatContent(w http.ResponseWriter, r *http.Request) {
-	_ = chat.Content().Render(r.Context(), w)
+	cookies := r.Cookies()
+	var username string
+	for cookie := range cookies {
+		if cookies[cookie].Name == "colab-auth" {
+			username = cookies[cookie].Value
+		}
+	}
+
+	_ = chat.Content(username).Render(r.Context(), w)
 }
 
 var upgrader = websocket.Upgrader{
@@ -32,9 +41,11 @@ var upgrader = websocket.Upgrader{
 
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Message)
+var clientMu sync.RWMutex
 
 type Message struct {
-	Msg string `json:"chat-message"`
+	Username string `json:"username"`
+	Msg      string `json:"chat-message"`
 }
 
 func (h *Handler) ChatWs(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +56,9 @@ func (h *Handler) ChatWs(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
+	clientMu.Lock()
 	clients[conn] = true
+	clientMu.Unlock()
 
 	for {
 		var msg Message
@@ -69,7 +82,7 @@ func HandleMessages() {
 
 		for client := range clients {
 			var buf = bytes.Buffer{}
-			err := chat.Message(msg.Msg).Render(context.Background(), &buf)
+			err := chat.Message(msg.Msg, msg.Username).Render(context.Background(), &buf)
 			if err != nil {
 				slog.Error("Error rendering message", "err", err)
 				continue

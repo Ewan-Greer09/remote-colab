@@ -23,22 +23,32 @@ templ Page() {
 	</html>
 }
 
-templ Content() {
+templ Content(username string) {
 	<main class="flex flex-col items-center bg-gray-100">
-		<div id="chat-room">
-			<ul>
-				<li id="message">...</li>
+		<div id="chat-room" class="w-full max-w-md mx-auto my-4 bg-white shadow-md rounded-lg overflow-hidden">
+			<ul class="divide-y divide-gray-200">
+				<li id="message" class="p-4"></li>
 			</ul>
 		</div>
 		<div hx-ext="ws" ws-connect="/chat/connect">
 			<form id="form" ws-target="#messages" ws-send>
-				<input name="chat-message"/>
-				<button type="submit">Send</button>
+				<div class="flex items-center border-b border-teal-500 py-2">
+					<input name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Full name"/>
+					<input type="text" name="username" value={ username } hidden/>
+					<button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+						Send
+					</button>
+				</div>
 			</form>
 		</div>
 	</main>
 }
 
-templ Message(msg string) {
-	<li class="text-gray-800" id="message" hx-swap-oob="beforeend"><p>{ fmt.Sprint(msg) }</p></li>
+templ Message(msg string, username string) {
+	<li class="text-gray-800" id="message" hx-swap-oob="beforeend">
+		<p>
+			<span class="font-bold">{ fmt.Sprintf("%s: ", username) }</span>
+			<span>{ fmt.Sprint(msg) }</span>
+		</p>
+	</li>
 }
