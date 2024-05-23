@@ -1,4 +1,7 @@
 /* CSS code block */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Reset default styles */
 body {

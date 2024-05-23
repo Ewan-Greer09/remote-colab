@@ -14,7 +14,7 @@ templ Page() {
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
-			<link rel="stylesheet" href="/public/css/index.css"/>
+			<link rel="stylesheet" href="/public/css/output.css"/>
 		</head>
 		<body>
 			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
@@ -31,9 +31,9 @@ templ Content(username string) {
 			</ul>
 		</div>
 		<div hx-ext="ws" ws-connect="/chat/connect">
-			<form id="form" ws-target="#messages" ws-send>
+			<form id="form" ws-target="#messages" onsubmit="clearInput()" ws-send>
 				<div class="flex items-center border-b border-teal-500 py-2">
-					<input name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Full name"/>
+					<input id="text-input" name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Full name"/>
 					<input type="text" name="username" value={ username } hidden/>
 					<button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
 						Send

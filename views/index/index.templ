@@ -20,7 +20,7 @@ templ Page() {
 			<link rel="stylesheet" href="/public/css/index.css"/>
 		</head>
 		<body>
-			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
+			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: true})
 			<div hx-get="/index/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
 		</body>
 	</html>

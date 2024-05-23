@@ -44,12 +44,19 @@ templ Header(headerData HeaderData) {
 				</li> // settings (account, etc)
 				if headerData.IsLoggedIn {
 					<li class="p-4">
+						<a href="/chat" class="flex flex-row">
+							<span class="material-symbols-outlined pr-1">
+								chat
+							</span><span class="hover:underline">chat</span>
+						</a>
+					</li> // Chat
+					<li class="p-4">
 						<a href="/logout" class="flex flex-row">
 							<span class="material-symbols-outlined pr-1">
 								logout 
 							</span><span class="hover:underline">Logout</span>
 						</a>
-					</li> // Login
+					</li> // Logout
 				} else {
 					<li class="p-4">
 						<a href="/login" class="flex flex-row">
