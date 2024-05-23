@@ -1,0 +1,69 @@
+package components
+
+import "fmt"
+
+type HeaderData struct {
+	Username   string
+	IsLoggedIn bool
+}
+
+templ Header(headerData HeaderData) {
+	<header class="justify-between flex flex-row p-4">
+		<div id="logo" class="px-4 flex flex-col ">
+			<img src="https://placehold.co/50" alt="Profile Photo" class="rounded-full"/>
+		</div>
+		<nav>
+			<ul class="flex flex-row">
+				<li class="p-4">
+					<a href="/" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							home
+						</span><span class="hover:underline">Home</span>
+					</a>
+				</li> // landing page
+				<li class="p-4">
+					<a href="/teams" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							groups
+						</span><span class="hover:underline">Teams</span>
+					</a>
+				</li> // page view area
+				<li class="p-4">
+					<a href="/profile" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							person
+						</span><span class="hover:underline">Profile</span>
+					</a>
+				</li> // personal public profile
+				<li class="p-4">
+					<a href="/settings" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							settings 
+						</span><span class="hover:underline">Settings</span>
+					</a>
+				</li> // settings (account, etc)
+				if headerData.IsLoggedIn {
+					<li class="p-4">
+						<a href="/logout" class="flex flex-row">
+							<span class="material-symbols-outlined pr-1">
+								logout 
+							</span><span class="hover:underline">Logout</span>
+						</a>
+					</li> // Login
+				} else {
+					<li class="p-4">
+						<a href="/login" class="flex flex-row">
+							<span class="material-symbols-outlined pr-1">
+								login 
+							</span><span class="hover:underline">Login</span>
+						</a>
+					</li> // Login
+				}
+			</ul>
+		</nav>
+		<div id="user-info" class="px-4 flex flex-col">
+			<img src="https://placehold.co/50" alt="Profile Photo" class="rounded-full"/>
+			<div><p id="username">{ fmt.Sprint(headerData.Username) }</p></div>
+		</div>
+	</header>
+}

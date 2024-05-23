@@ -1,10 +1,10 @@
-package index
+package teams
 
 import "github.com/Ewan-Greer09/remote-colab/views/components"
 import "fmt"
 
-type IndexData struct {
-	IntroText string
+type TeamsData struct {
+	Text string
 }
 
 templ Page() {
@@ -21,13 +21,13 @@ templ Page() {
 		</head>
 		<body>
 			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
-			<div hx-get="/index/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
+			<div hx-get="/teams/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
 		</body>
 	</html>
 }
 
-templ Content(data IndexData) {
+templ Content(data TeamsData) {
 	<main class="flex flex-col items-center bg-gray-100">
-		<p class="text-3xl font-bold underline text-gray-800">{ fmt.Sprint(data.IntroText) }</p>
+		<p class="text-3xl font-bold underline text-gray-800">{ fmt.Sprint(data.Text) }</p>
 	</main>
 }

@@ -3,3 +3,5 @@ tmp
 *_templ.go
 
 node_modules
+
+*.db

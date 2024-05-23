@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
+	"github.com/Ewan-Greer09/remote-colab/service/db"
 	"github.com/Ewan-Greer09/remote-colab/service/handlers"
 )
 
@@ -28,10 +30,26 @@ func NewServer(addr string, handler http.Handler) *Server {
 
 func NewHandler() http.HandlerFunc {
 	r := chi.NewMux()
-	r.Use(cors.AllowAll().Handler)
+	r.Use(
+		cors.AllowAll().Handler,
+		middleware.RequestID,
+		middleware.Logger,
+		middleware.Recoverer,
+	)
+
+	h := handlers.Handler{
+		DB: db.NewDatabase(),
+	}
 
 	r.Get("/", handlers.HandleRoot)
 	r.Get("/index/content", handlers.HandleRootContent)
+
+	r.Get("/teams", handlers.HandleTeamsPage)
+	r.Get("/teams/content", handlers.HandleTeamsContent)
+
+	r.Get("/login", handlers.HandleLoginPage)
+	r.Get("/login/content", handlers.HandleLoginContent)
+	r.Post("/login/submit", h.HandleUserLogin)
 
 	// Serve static files
 	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))

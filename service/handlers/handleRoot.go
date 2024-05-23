@@ -18,7 +18,10 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleRootContent(w http.ResponseWriter, r *http.Request) {
-	err := index.Content().Render(context.Background(), w)
+	data := index.IndexData{}
+	data.IntroText = "This is some intro text for the index page. This will eventually be a team management tool."
+
+	err := index.Content(data).Render(context.Background(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}
