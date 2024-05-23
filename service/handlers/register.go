@@ -53,5 +53,6 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Add("HX-Location", "/login")
 	render.HTML(w, r, "<p id='error'>User created successfully</p>")
 }

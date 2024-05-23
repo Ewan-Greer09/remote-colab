@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -51,8 +50,9 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    "placeholder", //TODO: needs to be a JWT holding some form of auth token to be decoded by middleware
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
 	}
 
 	http.SetCookie(w, &cookie)
-	render.HTML(w, r, fmt.Sprintf("%s %s", email, password))
+	w.Header().Add("HX-Location", "/")
 }
