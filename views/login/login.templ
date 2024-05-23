@@ -26,7 +26,7 @@ templ Page() {
 }
 
 //TODO: need to update this to make it a functional form with good place for error messages to be presented
-templ Content(data LoginData) {
+templ Content() {
 	<main class="flex flex-col items-center bg-gray-100">
 		<form hx-get="/login/submit" hx-target="#error" hx-swap="outerHTML" class="flex flex-col">
 			<div class="justify-between flex flex-row">
@@ -49,4 +49,8 @@ templ NoUserWithEmail() {
 
 templ PasswordsDoNotMatch() {
 	<p id="error" class="text-red-700 border-2 border-red-700 p-1">Passwords do not match</p>
+}
+
+templ Error(s string) {
+	<p id="error" class="text-red-700 border-2 border-red-700 p-1 m-1 text-center">{ s }</p>
 }

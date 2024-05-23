@@ -12,16 +12,14 @@ import (
 func HandleLoginPage(w http.ResponseWriter, r *http.Request) {
 	err := login.Page().Render(r.Context(), w)
 	if err != nil {
-		render.HTML(w, r, "<p>There was an issue</p>")
+		login.Error("Could not load page.").Render(r.Context(), w)
 	}
 }
 
 func HandleLoginContent(w http.ResponseWriter, r *http.Request) {
-	err := login.Content(login.LoginData{
-		Text: "This is some placeholder text.",
-	}).Render(r.Context(), w)
+	err := login.Content().Render(r.Context(), w)
 	if err != nil {
-		render.HTML(w, r, "<p>There was an issue</p>")
+		login.Error("Could not get content.").Render(r.Context(), w)
 	}
 }
 
@@ -31,7 +29,6 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.DB.GetUser(email)
 	if err != nil {
-		slog.Info("Could not get user:", "err", err)
 		err := login.NoUserWithEmail().Render(r.Context(), w)
 		if err != nil {
 			slog.Error("Could not render partial:", "err", err)
@@ -40,7 +37,6 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if u.Password != password {
-		slog.Info("Passwords do not match")
 		render.HTML(w, r, "<p>Passwords do not match</p>")
 		return
 	}

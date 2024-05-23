@@ -1,0 +1,44 @@
+package chat
+
+import "github.com/Ewan-Greer09/remote-colab/views/components"
+import "fmt"
+
+templ Page() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Chat</title>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
+			<link rel="stylesheet" href="/public/css/index.css"/>
+		</head>
+		<body>
+			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
+			<div hx-get="/chat/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
+		</body>
+	</html>
+}
+
+templ Content() {
+	<main class="flex flex-col items-center bg-gray-100">
+		<div id="chat-room">
+			<ul>
+				<li id="message">...</li>
+			</ul>
+		</div>
+		<div hx-ext="ws" ws-connect="/chat/connect">
+			<form id="form" ws-target="#messages" ws-send>
+				<input name="chat-message"/>
+				<button type="submit">Send</button>
+			</form>
+		</div>
+	</main>
+}
+
+templ Message(msg string) {
+	<li class="text-gray-800" id="message" hx-swap-oob="beforeend"><p>{ fmt.Sprint(msg) }</p></li>
+}

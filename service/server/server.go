@@ -55,6 +55,12 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/register/content", handlers.RegisterUserContent)
 	r.Get("/register/submit", h.RegisterUser)
 
+	r.Get("/chat", h.ChatPage)
+	r.Get("/chat/content", h.ChatContent)
+	r.Get("/chat/connect", h.ChatWs)
+
+	go handlers.HandleMessages()
+
 	// Serve static files
 	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))
 
