@@ -1,0 +1,50 @@
+package register
+
+import "github.com/Ewan-Greer09/remote-colab/views/components"
+
+templ Page() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Register</title>
+			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
+			<link rel="stylesheet" href="/public/css/index.css"/>
+		</head>
+		<body>
+			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
+			<div hx-get="/register/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
+		</body>
+	</html>
+}
+
+templ Content() {
+	<main class="flex flex-col items-center bg-gray-100">
+		<div class="border-2 border-gray-500 rounded-md p-4">
+			<h1 class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900">Register</h1>
+			<form hx-get="/register/submit" hx-target="#error" hx-swap="outerHTML" class="flex flex-col">
+				<div class="justify-between flex flex-row">
+					<label for="email" class="my-auto">Email:</label>
+					<input type="email" name="email-address" id="email-input" class="p-1 m-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
+				</div>
+				<span>
+					<label for="password">Password:</label>
+					<input type="password" name="password" id="password-input" class="p-1 m-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
+				</span>
+				<p id="error"></p>
+				<button type="submit" class="bg-gray-500 text-white rounded-md border-2 border-gray-800 hover:bg-gray-800 ease-in-out">Submit</button>
+			</form>
+		</div>
+	</main>
+}
+
+templ Error(s string) {
+	<p id="error" class="text-red-700 border-2 border-red-700 p-1 m-1 text-center">{ s }</p>
+}
+
+templ Success() {
+	<p id="error" class="text-green-700 border-2 border-green-700 p-1 m-1 text-center">User created successfully</p>
+}

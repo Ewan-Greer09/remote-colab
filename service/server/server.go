@@ -49,7 +49,11 @@ func NewHandler() http.HandlerFunc {
 
 	r.Get("/login", handlers.HandleLoginPage)
 	r.Get("/login/content", handlers.HandleLoginContent)
-	r.Post("/login/submit", h.HandleUserLogin)
+	r.Get("/login/submit", h.HandleUserLogin)
+
+	r.Get("/register", h.RegisterUserPage)
+	r.Get("/register/content", handlers.RegisterUserContent)
+	r.Get("/register/submit", h.RegisterUser)
 
 	// Serve static files
 	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))
