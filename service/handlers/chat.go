@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 	"sync"
@@ -14,17 +14,26 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 
+	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/chat"
 )
 
 func (h Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
-	var username string
-	for _, cookie := range r.Cookies() {
-		if cookie.Name == AuthCookieName {
-			username = cookie.Value
-		}
+	email := r.Context().Value(m.UsernameKey).(string)
+
+	u, err := h.DB.GetUser(email)
+	if err != nil {
+		slog.Error("oops")
+		return
 	}
-	_ = chat.ChatPage(username).Render(r.Context(), w)
+
+	log.Printf("Display Name: %s", u.DisplayName)
+
+	err = chat.ChatPage(u.Email, u.DisplayName).Render(r.Context(), w)
+	if err != nil {
+		log.Print(err)
+		return
+	}
 }
 
 func (h Handler) AvailableRooms(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +50,7 @@ func (h Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	var email string
 	roomName := r.URL.Query().Get("room-name")
 	for _, cookie := range r.Cookies() {
-		if cookie.Name == AuthCookieName {
+		if cookie.Name == m.AuthCookieName {
 			email = cookie.Value
 		}
 	}
@@ -64,7 +73,7 @@ func (h Handler) ChatRoom(w http.ResponseWriter, r *http.Request) {
 	roomId := chi.URLParam(r, "uid")
 	var username string
 	for _, cookie := range r.Cookies() {
-		if cookie.Name == AuthCookieName {
+		if cookie.Name == m.AuthCookieName {
 			username = cookie.Value
 		}
 	}
@@ -74,14 +83,12 @@ func (h Handler) ChatRoom(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
 	roomId := chi.URLParam(r, "uid")
-	var username string
-	for _, cookie := range r.Cookies() {
-		if cookie.Name == AuthCookieName {
-			username = cookie.Value
-		}
-	}
 
-	_ = chat.ChatWindow(username, roomId).Render(r.Context(), w)
+	u, err := h.DB.GetUser(r.Context().Value(m.UsernameKey).(string))
+	if err != nil {
+		slog.Error("Could not get user", "err", err)
+	}
+	_ = chat.ChatWindow(chat.ChatWindowProps{Username: u.DisplayName, RoomID: roomId}).Render(r.Context(), w)
 }
 
 // ws - section
@@ -92,6 +99,7 @@ var upgrade = websocket.Upgrader{
 
 type Room struct {
 	Id         string
+	Name       string
 	clients    map[*websocket.Conn]bool
 	broadcast  chan ChatMessage
 	register   chan *websocket.Conn
@@ -108,9 +116,10 @@ type ChatMessage struct {
 var rooms = make(map[string]*Room)
 var mu sync.Mutex
 
-func newRoom() *Room {
+func newRoom(name string) *Room {
 	return &Room{
 		Id:         uuid.NewString(),
+		Name:       name,
 		clients:    make(map[*websocket.Conn]bool),
 		broadcast:  make(chan ChatMessage),
 		register:   make(chan *websocket.Conn),
@@ -132,8 +141,14 @@ func (room *Room) run() {
 			if message.RoomId == room.Id {
 				for conn := range room.clients {
 					var buf bytes.Buffer
-					fmt.Println(message.Content)
-					err := chat.Message(message.Content.ChatMessage, message.Sender, message.SentAt).Render(context.Background(), &buf)
+
+					err := chat.Message(
+						chat.MessageProps{
+							Content:  message.Content.ChatMessage,
+							Username: message.Sender,
+							Time:     time.Now(),
+						},
+					).Render(context.Background(), &buf)
 					if err != nil {
 						conn.Close()
 						delete(room.clients, conn)
@@ -152,10 +167,10 @@ func (room *Room) run() {
 
 func (h Handler) Room(w http.ResponseWriter, r *http.Request) {
 	roomID := chi.URLParam(r, "uid")
-	slog.Info("Room ID", "id", roomID)
+
 	mu.Lock()
 	if _, ok := rooms[roomID]; !ok {
-		rooms[roomID] = newRoom()
+		rooms[roomID] = newRoom("")
 		go rooms[roomID].run()
 		slog.Info("Running new room", "roomId", roomID)
 	}
@@ -191,14 +206,6 @@ func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		var sender string
-		cookies := r.Cookies()
-		for _, cookie := range cookies {
-			if cookie.Name == AuthCookieName {
-				sender = cookie.Value
-			}
-		}
-
 		var mc MessageContent
 		err = json.Unmarshal(message, &mc)
 		if err != nil {
@@ -207,7 +214,7 @@ func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
 
 		m := ChatMessage{
 			Content: mc,
-			Sender:  sender,
+			Sender:  mc.Username,
 			RoomId:  room.Id,
 			SentAt:  time.Now().UTC(),
 		}

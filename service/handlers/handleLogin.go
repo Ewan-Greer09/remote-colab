@@ -6,10 +6,9 @@ import (
 
 	"github.com/go-chi/render"
 
+	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/login"
 )
-
-const AuthCookieName = "colab-auth"
 
 func HandleLoginPage(w http.ResponseWriter, r *http.Request) {
 	err := login.Page().Render(r.Context(), w)
@@ -44,7 +43,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := http.Cookie{
-		Name:     AuthCookieName,
+		Name:     m.AuthCookieName,
 		Value:    email, //TODO: needs to be a JWT holding some form of auth token to be decoded by middleware
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
@@ -57,7 +56,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) Logout(w http.ResponseWriter, r *http.Response) {
 	cookie := http.Cookie{
-		Name:     AuthCookieName,
+		Name:     m.AuthCookieName,
 		Value:    "",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,

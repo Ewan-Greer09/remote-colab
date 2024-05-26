@@ -1,12 +1,12 @@
 package chat
 
-import "github.com/Ewan-Greer09/remote-colab/views/components"
 import "fmt"
-import "github.com/Ewan-Greer09/remote-colab/service/db"
 import "time"
+import "github.com/Ewan-Greer09/remote-colab/views/components"
+import "github.com/Ewan-Greer09/remote-colab/service/db"
 
 // Displays the avilable rooms for a user to join
-templ ChatPage(email string) {
+templ ChatPage(email, username string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -23,7 +23,7 @@ templ ChatPage(email string) {
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"/>
 		</head>
 		<body class="roboto-bold">
-			@components.Header(components.HeaderData{Username: email, IsLoggedIn: false})
+			@components.Header(components.HeaderData{Username: username, IsLoggedIn: false})
 			<div hx-get={ fmt.Sprintf("/chat/available-rooms/%s", email) } hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
 		</body>
 	</html>
@@ -39,8 +39,8 @@ templ ChatRoom(username string, roomId string) {
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+			<script src="/public/js/chat.js"></script>
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
-			<link rel="stylesheet" href="/public/css/output.css"/>
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"/>
@@ -52,34 +52,55 @@ templ ChatRoom(username string, roomId string) {
 	</html>
 }
 
-templ ChatWindow(username string, roomId string) {
+type ChatWindowProps struct {
+	Username string
+	RoomID   string
+}
+
+templ ChatWindow(props ChatWindowProps) {
 	<main class="flex flex-col items-center bg-gray-100">
 		<div id="chat-room" class="w-full max-w-md mx-auto my-4 bg-white shadow-md rounded-lg overflow-hidden">
-			<ul class="divide-y divide-gray-200">
-				<li id="message" class="p-4"></li>
-			</ul>
+			<ul class="divide-y divide-gray-200 h-[500px] max-h-[500px] scroll-auto overflow-y-scroll" id="message"></ul>
 		</div>
-		<div hx-ext="ws" ws-connect={ fmt.Sprintf("/chat/connect/%s", roomId) }>
+		<div hx-ext="ws" ws-connect={ fmt.Sprintf("/chat/connect/%s", props.RoomID) }>
 			<form id="form" ws-target="#messages" ws-send>
 				<div class="flex items-center border-b border-teal-500 py-2">
 					<input id="text-input" name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Message"/>
-					<input type="text" name="username" value={ username } hidden/>
-					<button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+					<input type="text" name="username" value={ props.Username } hidden/>
+					<button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit" hx-post="/chat/send-message" hx-swap="outerHTML" hx-target="#form" hx-trigger="submit">
 						Send
 					</button>
 				</div>
 			</form>
+			<script>
+				document.getElementById("form").addEventListener("submit", function() {
+					document.getElementById("text-input").value = "";
+				});
+
+				document.addEventListener("htmx:afterSwap", function(event) {
+					var messageBox = document.getElementById("message");
+					messageBox.scrollTop = messageBox.scrollHeight;
+				});
+			</script>
 		</div>
 	</main>
 }
 
-templ Message(content string, username string, time time.Time) {
-	<li class="text-gray-800" id="message" hx-swap-oob="beforeend">
-		<p class="justify-between">
-			<span class="font-bold">{ fmt.Sprintf("%s: ", username) }</span>
-			<span>{ fmt.Sprintf("%s", content) }</span>
-			<span class="font-thin">{ fmt.Sprintf("%s", time.Format("03:04")) }</span>
-		</p>
+type MessageProps struct {
+	Content  string
+	Username string
+	Time     time.Time
+}
+
+templ Message(props MessageProps) {
+	<li class="text-gray-800 flex" id="message" hx-swap-oob="beforeend">
+		<div class="flex flex-row justify-between p-2">
+			<div>
+				<span class="font-bold">{ fmt.Sprintf("%s:", props.Username) }</span>
+				<span class="">{ fmt.Sprintf("%s", props.Content) }</span>
+			</div>
+			<div class="font-light text-gray-600">{ fmt.Sprintf(props.Time.Local().Format("03:04:05")) }</div>
+		</div>
 	</li>
 }
 
@@ -90,15 +111,15 @@ templ AvailableRooms(rooms []db.ChatRoom) {
 			<button type="submit">Create Room</button>
 		</form>
 		<ul>
-			for _, room := range rooms {
-				@RoomCard(room)
+			for i := len(rooms) - 1; i >= 0; i-- {
+				@RoomCard(rooms[i])
 			}
 		</ul>
 	</main>
 }
 
 templ RoomCard(room db.ChatRoom) {
-	<li class="cursor-pointer p-2 m-1 border-2 border-slate-600 text-slate-700 rounded-md hover:text-white hover:bg-slate-500  ease-in-out">
+	<li class="cursor-pointer p-2 m-1 border-2 border-slate-600 text-slate-700 rounded-md hover:text-white hover:bg-slate-500 ease-in-out">
 		<a href={ templ.SafeURL(fmt.Sprintf("/chat/room/%s", room.UID)) }>
 			Name: { fmt.Sprint(room.Name) }
 		</a>

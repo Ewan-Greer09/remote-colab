@@ -7,13 +7,14 @@ import (
 
 	"github.com/go-chi/render"
 
+	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/index"
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	var username string
 	for _, cookie := range r.Cookies() {
-		if cookie.Name == AuthCookieName {
+		if cookie.Name == m.AuthCookieName {
 			username = cookie.Value
 		}
 	}

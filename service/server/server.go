@@ -9,6 +9,7 @@ import (
 
 	"github.com/Ewan-Greer09/remote-colab/service/db"
 	"github.com/Ewan-Greer09/remote-colab/service/handlers"
+	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
 )
 
 type Server struct {
@@ -36,6 +37,7 @@ func NewHandler() http.HandlerFunc {
 		middleware.Logger,
 		middleware.Recoverer,
 		middleware.StripSlashes,
+		m.Identity,
 	)
 
 	h := handlers.Handler{

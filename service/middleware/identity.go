@@ -3,21 +3,20 @@ package middleware
 import (
 	"context"
 	"net/http"
-
-	"github.com/Ewan-Greer09/remote-colab/service/handlers"
 )
 
 type contextKey string
 
 const (
-	usernameKey contextKey = "username"
+	UsernameKey    contextKey = "username"
+	AuthCookieName string     = "colab-auth"
 )
 
 func Identity(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var username string
 		for _, cookie := range r.Cookies() {
-			if cookie.Name == handlers.AuthCookieName {
+			if cookie.Name == AuthCookieName {
 				username = cookie.Value
 			}
 		}
@@ -26,8 +25,6 @@ func Identity(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-
-		r = r.WithContext(context.WithValue(r.Context(), usernameKey, username))
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UsernameKey, username)))
 	})
 }

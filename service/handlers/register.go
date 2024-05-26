@@ -28,6 +28,7 @@ func RegisterUserContent(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email-address")
 	password := r.URL.Query().Get("password")
+	displayName := r.URL.Query().Get("display-name")
 
 	_, err := h.DB.GetUser(email)
 	if err != gorm.ErrRecordNotFound {
@@ -39,8 +40,9 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := db.User{
-		Email:    email,
-		Password: password,
+		Email:       email,
+		DisplayName: displayName,
+		Password:    password,
 	}
 
 	err = h.DB.CreateUser(user)
