@@ -91,6 +91,21 @@ func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
 	_ = chat.ChatWindow(chat.ChatWindowProps{Username: u.DisplayName, RoomID: roomId}).Render(r.Context(), w)
 }
 
+func (h Handler) Invite(w http.ResponseWriter, r *http.Request) {
+	email := r.URL.Query().Get("invitee")
+	roomId := r.URL.Query().Get("roomId")
+	u, err := h.DB.GetUser(email)
+	if err != nil {
+		slog.Error("Could not get user", "err", err)
+		return
+	}
+
+	err = h.DB.AddUserToRoom(*u, roomId)
+	if err != nil {
+		slog.Error("Could not update room", "err", err)
+	}
+}
+
 // ws - section
 var upgrade = websocket.Upgrader{
 	ReadBufferSize:  32,

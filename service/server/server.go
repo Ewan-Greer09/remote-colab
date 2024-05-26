@@ -64,6 +64,7 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/chat/room/window/{uid}", h.ChatWindow)
 	r.Get("/chat/connect/{uid}", h.Room)
 	r.Get("/chat/create", h.CreateRoom)
+	r.Get("/chat/invite", h.Invite)
 
 	// r.Get("/chat/connect", )
 

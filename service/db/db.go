@@ -16,21 +16,21 @@ type User struct {
 
 	DisplayName string `gorm:"default:NULL"`
 
-	Rooms []ChatRoom `gorm:"many2many:user_rooms;"`
-	Teams []Team     `gorm:"many2many:user_teams;"`
+	ChatRooms []ChatRoom `gorm:"many2many:chat_room_members;"`
 }
 
 type ChatRoom struct {
 	gorm.Model
-	UID     uuid.UUID
-	Name    string `gorm:"unique"`
-	Members []User `gorm:"many2many:user_rooms;"`
+	UID     uuid.UUID `gorm:"unique"`
+	Name    string
+	Members []User `gorm:"many2many:chat_room_members;"`
 }
 
 type Team struct {
 	gorm.Model
-	Name    string `gorm:"unique"`
-	Members []User `gorm:"many2many:user_teams;"`
+	UID     uuid.UUID `gorm:"unique"`
+	Name    string
+	Members []User `gorm:"many2many:team_members;"`
 }
 
 type Database struct {
@@ -58,12 +58,27 @@ func (db Database) CreateUser(data User) error {
 
 func (db Database) GetUser(email string) (*User, error) {
 	var u *User
-	tx := db.conn.Take(&u, "email = ?", email)
+	tx := db.conn.Model(&User{}).First(&u, "email = ?", email)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	return u, nil
+}
+
+func (db Database) AddUserToRoom(u User, roomId string) error {
+	var room ChatRoom
+	tx := db.conn.First(&room, "uid = ?", roomId)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	err := db.conn.Model(&room).Association("Members").Append(&u)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func newDBConn(dbName string) (*gorm.DB, error) {
@@ -90,7 +105,7 @@ func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
 	}
 
 	var rooms []ChatRoom
-	err := db.conn.Model(&user).Association("Rooms").Find(&rooms)
+	err := db.conn.Model(&user).Association("ChatRooms").Find(&rooms)
 	if err != nil {
 		return nil, err
 	}
