@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -85,8 +86,8 @@ func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
 
 // ws - section
 var upgrade = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  32,
+	WriteBufferSize: 32,
 }
 
 type Room struct {
@@ -101,6 +102,7 @@ type ChatMessage struct {
 	Content MessageContent
 	Sender  string
 	RoomId  string
+	SentAt  time.Time
 }
 
 var rooms = make(map[string]*Room)
@@ -131,7 +133,7 @@ func (room *Room) run() {
 				for conn := range room.clients {
 					var buf bytes.Buffer
 					fmt.Println(message.Content)
-					err := chat.Message(message.Content.ChatMessage, message.Sender).Render(context.Background(), &buf)
+					err := chat.Message(message.Content.ChatMessage, message.Sender, message.SentAt).Render(context.Background(), &buf)
 					if err != nil {
 						conn.Close()
 						delete(room.clients, conn)
@@ -207,6 +209,7 @@ func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
 			Content: mc,
 			Sender:  sender,
 			RoomId:  room.Id,
+			SentAt:  time.Now().UTC(),
 		}
 		room.broadcast <- m
 	}

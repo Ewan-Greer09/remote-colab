@@ -7,7 +7,7 @@ type IndexData struct {
 	IntroText string
 }
 
-templ Page() {
+templ Page(username string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -20,7 +20,7 @@ templ Page() {
 			<link rel="stylesheet" href="/public/css/index.css"/>
 		</head>
 		<body>
-			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: true})
+			@components.Header(components.HeaderData{Username: username, IsLoggedIn: true})
 			<div hx-get="/index/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
 		</body>
 	</html>

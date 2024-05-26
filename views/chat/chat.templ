@@ -3,6 +3,7 @@ package chat
 import "github.com/Ewan-Greer09/remote-colab/views/components"
 import "fmt"
 import "github.com/Ewan-Greer09/remote-colab/service/db"
+import "time"
 
 // Displays the avilable rooms for a user to join
 templ ChatPage(email string) {
@@ -61,7 +62,7 @@ templ ChatWindow(username string, roomId string) {
 		<div hx-ext="ws" ws-connect={ fmt.Sprintf("/chat/connect/%s", roomId) }>
 			<form id="form" ws-target="#messages" ws-send>
 				<div class="flex items-center border-b border-teal-500 py-2">
-					<input id="text-input" name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Full name"/>
+					<input id="text-input" name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Message"/>
 					<input type="text" name="username" value={ username } hidden/>
 					<button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
 						Send
@@ -72,11 +73,12 @@ templ ChatWindow(username string, roomId string) {
 	</main>
 }
 
-templ Message(content string, username string) {
+templ Message(content string, username string, time time.Time) {
 	<li class="text-gray-800" id="message" hx-swap-oob="beforeend">
-		<p>
+		<p class="justify-between">
 			<span class="font-bold">{ fmt.Sprintf("%s: ", username) }</span>
 			<span>{ fmt.Sprintf("%s", content) }</span>
+			<span class="font-thin">{ fmt.Sprintf("%s", time.Format("03:04")) }</span>
 		</p>
 	</li>
 }

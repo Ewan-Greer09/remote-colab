@@ -11,7 +11,14 @@ import (
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	err := index.Page().Render(context.Background(), w)
+	var username string
+	for _, cookie := range r.Cookies() {
+		if cookie.Name == AuthCookieName {
+			username = cookie.Value
+		}
+	}
+
+	err := index.Page(username).Render(context.Background(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}
