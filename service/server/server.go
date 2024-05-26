@@ -35,6 +35,7 @@ func NewHandler() http.HandlerFunc {
 		middleware.RequestID,
 		middleware.Logger,
 		middleware.Recoverer,
+		middleware.StripSlashes,
 	)
 
 	h := handlers.Handler{
@@ -56,10 +57,13 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/register/submit", h.RegisterUser)
 
 	r.Get("/chat", h.ChatPage)
-	r.Get("/chat/content", h.ChatContent)
-	r.Get("/chat/connect", h.ChatWs)
+	r.Get("/chat/available-rooms/{username}", h.AvailableRooms)
+	r.Get("/chat/room/{uid}", h.ChatRoom)
+	r.Get("/chat/room/window/{uid}", h.ChatWindow)
+	r.Get("/chat/connect/{uid}", h.Room)
+	r.Get("/chat/create", h.CreateRoom)
 
-	go handlers.HandleMessages()
+	// r.Get("/chat/connect", )
 
 	// Serve static files
 	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))

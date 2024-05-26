@@ -9,6 +9,8 @@ import (
 	"github.com/Ewan-Greer09/remote-colab/views/login"
 )
 
+const AuthCookieName = "colab-auth"
+
 func HandleLoginPage(w http.ResponseWriter, r *http.Request) {
 	err := login.Page().Render(r.Context(), w)
 	if err != nil {
@@ -42,8 +44,21 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := http.Cookie{
-		Name:     "colab-auth",
+		Name:     AuthCookieName,
 		Value:    email, //TODO: needs to be a JWT holding some form of auth token to be decoded by middleware
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	}
+
+	http.SetCookie(w, &cookie)
+	w.Header().Add("HX-Location", "/")
+}
+
+func (h Handler) Logout(w http.ResponseWriter, r *http.Response) {
+	cookie := http.Cookie{
+		Name:     AuthCookieName,
+		Value:    "",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",

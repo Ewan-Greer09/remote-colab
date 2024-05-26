@@ -4,6 +4,8 @@ FROM golang:1.22
 RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/a-h/templ/cmd/templ@latest
 
+RUN 
+
 # Set the working directory inside the container
 WORKDIR /app
 
