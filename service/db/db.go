@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
@@ -21,9 +20,22 @@ type User struct {
 
 type ChatRoom struct {
 	gorm.Model
-	UID     uuid.UUID `gorm:"unique"`
-	Name    string
+	UID  uuid.UUID `gorm:"unique"`
+	Name string
+
 	Members []User `gorm:"many2many:chat_room_members;"`
+
+	Messages []Message
+}
+
+type Message struct {
+	gorm.Model
+	ChatRoomID string   `gorm:"index"`
+	ChatRoom   ChatRoom `gorm:"foreignKey:ChatRoomID"`
+
+	Author string `gorm:"index"`
+
+	Content string `gorm:"type:text"`
 }
 
 type Team struct {
@@ -89,7 +101,7 @@ func newDBConn(dbName string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	err = db.AutoMigrate(User{}, ChatRoom{}, Team{})
+	err = db.AutoMigrate(User{}, ChatRoom{}, Team{}, Message{})
 	if err != nil {
 		panic(err)
 	}
@@ -113,22 +125,48 @@ func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
 	return rooms, nil
 }
 
-func (db Database) CreateRoom(email string, roomName string) error {
+func (db Database) CreateRoom(room ChatRoom, email string) error {
 	var user User
 	tx := db.conn.Find(&user, "email = ?", email)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
-	room := ChatRoom{
-		UID:     uuid.New(),
-		Name:    roomName,
-		Members: []User{user},
-	}
-
-	log.Printf("Created: %s", room.Name)
+	room.Members = append(room.Members, user)
 
 	tx = db.conn.Create(&room)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
+func (db Database) GetAllRooms() ([]ChatRoom, error) {
+	var rooms []ChatRoom
+	tx := db.conn.Find(&rooms)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return rooms, nil
+}
+
+func (db Database) CreateMessage(roomId string, author string, content string) error {
+	var room ChatRoom
+	tx := db.conn.First(&room, "uid = ?", roomId)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	msg := Message{
+		ChatRoom:   room,
+		ChatRoomID: room.UID.String(),
+		Author:     author,
+		Content:    content,
+	}
+
+	tx = db.conn.Create(&msg)
 	if tx.Error != nil {
 		return tx.Error
 	}

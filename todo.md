@@ -12,4 +12,4 @@
 [x] Style Chat windows
 [ ] Store messages in a database so they can be persited when a user leaves or joins a chat
 [x] Firgure out how to handle multiiple chat rooms
-[ ] Allow users to be invited to a chat
+[x] Allow users to be invited to a chat
