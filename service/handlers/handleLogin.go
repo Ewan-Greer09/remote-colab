@@ -54,7 +54,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("HX-Location", "/")
 }
 
-func (h Handler) Logout(w http.ResponseWriter, r *http.Response) {
+func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
 		Name:     m.AuthCookieName,
 		Value:    "",

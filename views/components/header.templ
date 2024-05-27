@@ -42,37 +42,34 @@ templ Header(headerData HeaderData) {
 						</span><span class="hover:underline">Settings</span>
 					</a>
 				</li> // settings (account, etc)
-				if headerData.IsLoggedIn {
-					<li class="p-4">
-						<a href="/chat" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								chat
-							</span><span class="hover:underline">chat</span>
-						</a>
-					</li> // Chat
-					<li class="p-4">
-						<a href="/logout" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								logout 
-							</span><span class="hover:underline">Logout</span>
-						</a>
-					</li> // Logout
-				} else {
-					<li class="p-4">
-						<a href="/login" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								login 
-							</span><span class="hover:underline">Login</span>
-						</a>
-					</li> // Login
-					<li class="p-4">
-						<a href="/register" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								how_to_reg
-							</span><span class="hover:underline">Register</span>
-						</a>
-					</li> // Register
-				}
+				<li class="p-4">
+					<a href="/chat" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							chat
+						</span><span class="hover:underline">chat</span>
+					</a>
+				</li> // Chat
+				<li class="p-4">
+					<a href="/logout" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							logout 
+						</span><span class="hover:underline">Logout</span>
+					</a>
+				</li> // Logout
+				<li class="p-4">
+					<a href="/login" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							login 
+						</span><span class="hover:underline">Login</span>
+					</a>
+				</li> // Login
+				<li class="p-4">
+					<a href="/register" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1">
+							how_to_reg
+						</span><span class="hover:underline">Register</span>
+					</a>
+				</li> // Register
 			</ul>
 		</nav>
 		<div id="user-info" class="px-4 flex flex-col">

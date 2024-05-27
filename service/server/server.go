@@ -54,6 +54,8 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/login/content", handlers.HandleLoginContent)
 	r.Get("/login/submit", h.HandleUserLogin)
 
+	r.Get("/logout", h.Logout)
+
 	r.Get("/register", h.RegisterUserPage)
 	r.Get("/register/content", handlers.RegisterUserContent)
 	r.Get("/register/submit", h.RegisterUser)
