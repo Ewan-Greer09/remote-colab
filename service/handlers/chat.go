@@ -76,21 +76,21 @@ func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
 	messages, err := h.DB.GetMessagesByRoomUID(roomId)
 	if err != nil {
 		slog.Error("Could not get messages", "err", err)
-		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error()))
 		return
 	}
 
 	u, err := h.DB.GetUser(r.Context().Value(m.UsernameKey).(string))
 	if err != nil {
 		slog.Error("Could not get user", "err", err)
-		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error()))
 		return
 	}
 
 	err = chat.ChatWindow(chat.ChatWindowProps{Username: u.DisplayName, RoomID: roomId, Messages: messages}).Render(r.Context(), w)
 	if err != nil {
 		slog.Error("Could not render ChatWindow", "err", err)
-		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error()))
 		return
 	}
 }

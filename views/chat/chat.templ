@@ -70,7 +70,7 @@ templ ChatWindow(props ChatWindowProps) {
 				for _, message := range props.Messages {
 					<li class="flex flex-row justify-between p-2">
 						<div>
-							<b>{ fmt.Sprintf("%s:", props.Username) }</b>
+							<b>{ fmt.Sprintf("%s:", message.Author) }</b>
 							{ fmt.Sprintf("%s", message.Content) }
 						</div>
 						<div class="font-light text-gray-600">{ fmt.Sprintf(message.CreatedAt.Local().Format("03:04:05")) }</div>
@@ -90,14 +90,25 @@ templ ChatWindow(props ChatWindowProps) {
 				</div>
 			</form>
 			<script>
-				document.getElementById("form").addEventListener("submit", function() {
-					document.getElementById("text-input").value = "";
-				});
+            document.getElementById("form").addEventListener("submit", function() {
+                document.getElementById("text-input").value = "";
+            });
 
-				document.addEventListener("htmx:afterSwap", function(event) {
-					var messageBox = document.getElementById("messages");
-					messageBox.scrollTop = messageBox.scrollHeight; 
-				});
+            function scrollToBottom() {
+                var messageBox = document.getElementById("messages");
+                messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;
+            }
+
+            document.addEventListener("htmx:afterRequest", function(event) {
+                if (event.target.id === "messages" || event.target.closest("#messages")) {
+                    scrollToBottom();
+                }
+            });
+
+            // Ensure the chat window is scrolled to the bottom after initial load
+            window.addEventListener('load', function() {
+                scrollToBottom();
+            });
 			</script>
 		</div>
 	</main>
