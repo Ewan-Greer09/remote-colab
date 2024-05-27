@@ -13,3 +13,14 @@
 [x] Store messages in a database so they can be persited when a user leaves or joins a chat
 [x] Firgure out how to handle multiiple chat rooms
 [x] Allow users to be invited to a chat
+
+[ ] Feat: Team space
+[ ] Create create team page
+[ ] Create page to display a users teams
+[ ] Auth for team only chats
+[ ] Each team should have a chat associated with it
+
+[ ] Feat: User profile
+[ ] Create page
+[ ] User should have a profile image
+[ ] User should be able to modify the details of their profile from this page
