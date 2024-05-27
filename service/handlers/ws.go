@@ -65,9 +65,6 @@ func newRoom(name string, email string) *Room {
 		Members:  []db.User{},
 		Messages: []db.Message{},
 	}, email)
-
-	slog.Info("Room created", "room", room.Id, "name", room.Name)
-
 	return room
 }
 
@@ -76,16 +73,15 @@ func (room *Room) run() {
 	for {
 		select {
 		case conn := <-room.register:
-			slog.Info("Registering connection", "room", room.Id, "name", room.Name, "clients", room.clients)
 			room.clients[conn] = true
-			slog.Info("Connection registered", "room", room.Id, "name", room.Name, "clients", room.clients)
+
 		case conn := <-room.unregister:
 			if _, ok := room.clients[conn]; ok {
 				delete(room.clients, conn)
 				conn.Close()
 			}
+
 		case message := <-room.broadcast:
-			slog.Info("Broadcasting message", "room", room.Id, "message", message.Content, "author", message.Author, "room", room.Name)
 			if message.ChatRoom.UID.String() == room.Id {
 				for conn := range room.clients {
 					var buf bytes.Buffer
@@ -105,9 +101,13 @@ func (room *Room) run() {
 						delete(room.clients, conn)
 					}
 
-					slog.Info("Message sent", "message", message.Content, "author", message.Author, "room", room.Id)
-					room.Handler.DB.CreateMessage(room.Id, message.Author, message.Content)
-					slog.Info("Message saved", "message", message.Content, "author", message.Author, "room", room.Id)
+					err = room.Handler.DB.CreateMessage(room.Id, message.Author, message.Content)
+					if err != nil {
+						slog.Error("Could not create message", "err", err)
+						return
+					}
+
+					slog.Info("Message sent", "room", room.Id, "author", message.Author, "RoomName", room.Name)
 				}
 			}
 		}
@@ -145,23 +145,17 @@ func (h Handler) Room(w http.ResponseWriter, r *http.Request) {
 		room = *r
 	}
 
-	slog.Info("Room found", "room", room.Id, "name", room.Name)
-
 	go room.run()
-
-	slog.Info("Handling connections", "room", room.Id, "name", room.Name)
 	handleConnections(&room, w, r)
 }
 
 func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
-	slog.Info("Handling connection", "room", room.Id, "name", room.Name)
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		slog.Error("Could not upgrade connection", "err", err)
 		return
 	}
 	defer conn.Close()
-	slog.Info("Connection upgraded", "room", room.Id, "name", room.Name)
 	room.register <- conn
 
 	for {
@@ -186,8 +180,6 @@ func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
 			},
 			ChatRoomID: room.Id,
 		}
-
-		slog.Info("Message received", "message", m.Content, "author", m.Author)
 
 		room.broadcast <- m
 	}
