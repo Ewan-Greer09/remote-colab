@@ -22,8 +22,7 @@ func Identity(next http.Handler) http.Handler {
 		}
 
 		if username == "" {
-			next.ServeHTTP(w, r)
-			return
+			username = "Undefined"
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UsernameKey, username)))
 	})

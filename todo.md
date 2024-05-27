@@ -10,6 +10,6 @@
 [x] Add users email to site cookie, and store it in req context when a message happens
 [x] Style login screen
 [x] Style Chat windows
-[ ] Store messages in a database so they can be persited when a user leaves or joins a chat
+[x] Store messages in a database so they can be persited when a user leaves or joins a chat
 [x] Firgure out how to handle multiiple chat rooms
 [x] Allow users to be invited to a chat

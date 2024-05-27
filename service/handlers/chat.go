@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 	"github.com/google/uuid"
 
 	"github.com/Ewan-Greer09/remote-colab/service/db"
@@ -21,8 +23,6 @@ func (h Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
 		slog.Error("oops")
 		return
 	}
-
-	log.Printf("Display Name: %s", u.DisplayName)
 
 	err = chat.ChatPage(u.Email, u.DisplayName).Render(r.Context(), w)
 	if err != nil {
@@ -46,7 +46,7 @@ func (h Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	email := r.Context().Value(m.UsernameKey).(string)
 
 	err := h.DB.CreateRoom(db.ChatRoom{
-		UID:      uuid.New(),
+		UID:      uuid.NewString(),
 		Name:     roomName,
 		Members:  []db.User{},
 		Messages: []db.Message{},
@@ -66,24 +66,33 @@ func (h Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) ChatRoom(w http.ResponseWriter, r *http.Request) {
 	roomId := chi.URLParam(r, "uid")
-	var username string
-	for _, cookie := range r.Cookies() {
-		if cookie.Name == m.AuthCookieName {
-			username = cookie.Value
-		}
-	}
+	username := r.Context().Value(m.UsernameKey).(string)
 
 	_ = chat.ChatRoom(username, roomId).Render(r.Context(), w)
 }
 
 func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
 	roomId := chi.URLParam(r, "uid")
+	messages, err := h.DB.GetMessagesByRoomUID(roomId)
+	if err != nil {
+		slog.Error("Could not get messages", "err", err)
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		return
+	}
 
 	u, err := h.DB.GetUser(r.Context().Value(m.UsernameKey).(string))
 	if err != nil {
 		slog.Error("Could not get user", "err", err)
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		return
 	}
-	_ = chat.ChatWindow(chat.ChatWindowProps{Username: u.DisplayName, RoomID: roomId}).Render(r.Context(), w)
+
+	err = chat.ChatWindow(chat.ChatWindowProps{Username: u.DisplayName, RoomID: roomId, Messages: messages}).Render(r.Context(), w)
+	if err != nil {
+		slog.Error("Could not render ChatWindow", "err", err)
+		render.HTML(w, r, fmt.Sprintf("<p>%s</p>", err.Error())) //? should this be a modal that dissapears after a while and dosnt block?
+		return
+	}
 }
 
 func (h Handler) Invite(w http.ResponseWriter, r *http.Request) {

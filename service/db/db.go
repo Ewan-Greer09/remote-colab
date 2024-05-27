@@ -10,9 +10,8 @@ import (
 
 type User struct {
 	gorm.Model
-	Email    string `gorm:"unique"`
-	Password string `gorm:"default:NULL"`
-
+	Email       string `gorm:"unique"`
+	Password    string `gorm:"default:NULL"`
 	DisplayName string `gorm:"default:NULL"`
 
 	ChatRooms []ChatRoom `gorm:"many2many:chat_room_members;"`
@@ -20,22 +19,19 @@ type User struct {
 
 type ChatRoom struct {
 	gorm.Model
-	UID  uuid.UUID `gorm:"unique"`
-	Name string
-
-	Members []User `gorm:"many2many:chat_room_members;"`
-
+	UID      string `gorm:"unique"`
+	Name     string
+	Members  []User `gorm:"many2many:chat_room_members;"`
 	Messages []Message
 }
 
 type Message struct {
 	gorm.Model
-	ChatRoomID string   `gorm:"index"`
-	ChatRoom   ChatRoom `gorm:"foreignKey:ChatRoomID"`
+	ChatRoomID string `gorm:"index;not null;type:uuid"`
 
-	Author string `gorm:"index"`
-
-	Content string `gorm:"type:text"`
+	Author   string
+	Content  string   `gorm:"type:text"`
+	ChatRoom ChatRoom `gorm:"foreignKey:ChatRoomID"`
 }
 
 type Team struct {
@@ -50,7 +46,7 @@ type Database struct {
 }
 
 func NewDatabase() *Database {
-	db, err := newDBConn("user.db")
+	db, err := newDBConn("project.db")
 	if err != nil {
 		panic(err)
 	}
@@ -70,6 +66,7 @@ func (db Database) CreateUser(data User) error {
 
 func (db Database) GetUser(email string) (*User, error) {
 	var u *User
+
 	tx := db.conn.Model(&User{}).First(&u, "email = ?", email)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -161,7 +158,7 @@ func (db Database) CreateMessage(roomId string, author string, content string) e
 
 	msg := Message{
 		ChatRoom:   room,
-		ChatRoomID: room.UID.String(),
+		ChatRoomID: roomId,
 		Author:     author,
 		Content:    content,
 	}
@@ -172,4 +169,18 @@ func (db Database) CreateMessage(roomId string, author string, content string) e
 	}
 
 	return nil
+}
+
+func (db Database) GetMessagesByRoomUID(roomUID string) ([]Message, error) {
+	var room ChatRoom
+	tx := db.conn.First(&room, "uid = ?", roomUID)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	var messages []Message
+	err := db.conn.Model(&room).Association("Messages").Find(&messages)
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
 }

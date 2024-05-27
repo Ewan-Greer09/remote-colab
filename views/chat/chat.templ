@@ -55,6 +55,7 @@ templ ChatRoom(username string, roomId string) {
 type ChatWindowProps struct {
 	Username string
 	RoomID   string
+	Messages []db.Message
 }
 
 templ ChatWindow(props ChatWindowProps) {
@@ -65,10 +66,21 @@ templ ChatWindow(props ChatWindowProps) {
 			<button type="submit">Invite</button>
 		</form>
 		<div id="chat-room" class="w-full max-w-md mx-auto my-4 bg-white shadow-md rounded-lg overflow-hidden">
-			<ul class="divide-y divide-gray-200 h-[500px] max-h-[500px] scroll-auto overflow-y-scroll" id="message"></ul>
+			<ul class="divide-y divide-gray-200 h-[500px] max-h-[500px] scroll-auto overflow-y-scroll" id="messages">
+				for _, message := range props.Messages {
+					<li class="flex flex-row justify-between p-2">
+						<div>
+							<b>{ fmt.Sprintf("%s:", props.Username) }</b>
+							{ fmt.Sprintf("%s", message.Content) }
+						</div>
+						<div class="font-light text-gray-600">{ fmt.Sprintf(message.CreatedAt.Local().Format("03:04:05")) }</div>
+					</li>
+				}
+				<div id="new-messages"></div>
+			</ul>
 		</div>
-		<div hx-ext="ws" ws-connect={ fmt.Sprintf("/chat/connect/%s", props.RoomID) }>
-			<form id="form" ws-target="#messages" ws-send>
+		<div hx-ext="ws" hx-trigger="load" ws-connect={ fmt.Sprintf("/chat/connect/%s", props.RoomID) }>
+			<form id="form" ws-send="true">
 				<div class="flex items-center border-b border-teal-500 py-2">
 					<input id="text-input" name="chat-message" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Enter your message" aria-label="Message"/>
 					<input type="text" name="username" value={ props.Username } hidden/>
@@ -83,8 +95,8 @@ templ ChatWindow(props ChatWindowProps) {
 				});
 
 				document.addEventListener("htmx:afterSwap", function(event) {
-					var messageBox = document.getElementById("message");
-					messageBox.scrollTop = messageBox.scrollHeight;
+					var messageBox = document.getElementById("messages");
+					messageBox.scrollTop = messageBox.scrollHeight; 
 				});
 			</script>
 		</div>
@@ -98,15 +110,15 @@ type MessageProps struct {
 }
 
 templ Message(props MessageProps) {
-	<li class="text-gray-800 flex" id="message" hx-swap-oob="beforeend">
-		<div class="flex flex-row justify-between p-2">
+	<div class="text-gray-800 flex" id="new-messages" hx-swap-oob="beforeend">
+		<li class="flex flex-row justify-between p-2">
 			<div>
-				<span class="font-bold">{ fmt.Sprintf("%s:", props.Username) }</span>
-				<span class="">{ fmt.Sprintf("%s", props.Content) }</span>
+				<b>{ fmt.Sprintf("%s:", props.Username) }</b>
+				{ fmt.Sprintf("%s", props.Content) }
 			</div>
 			<div class="font-light text-gray-600">{ fmt.Sprintf(props.Time.Local().Format("03:04:05")) }</div>
-		</div>
-	</li>
+		</li>
+	</div>
 }
 
 templ AvailableRooms(rooms []db.ChatRoom) {

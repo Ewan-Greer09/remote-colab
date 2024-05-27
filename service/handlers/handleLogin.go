@@ -44,7 +44,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	cookie := http.Cookie{
 		Name:     m.AuthCookieName,
-		Value:    email, //TODO: needs to be a JWT holding some form of auth token to be decoded by middleware
+		Value:    email,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",

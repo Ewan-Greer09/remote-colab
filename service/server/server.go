@@ -33,11 +33,11 @@ func NewHandler() http.HandlerFunc {
 	r := chi.NewMux()
 	r.Use(
 		cors.AllowAll().Handler,
+		m.Identity,
 		middleware.RequestID,
 		middleware.Logger,
 		middleware.Recoverer,
 		middleware.StripSlashes,
-		m.Identity,
 	)
 
 	h := handlers.Handler{
@@ -65,8 +65,6 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/chat/connect/{uid}", h.Room)
 	r.Get("/chat/create", h.CreateRoom)
 	r.Get("/chat/invite", h.Invite)
-
-	// r.Get("/chat/connect", )
 
 	// Serve static files
 	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))
