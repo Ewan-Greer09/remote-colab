@@ -18,6 +18,7 @@ RUN go mod download
 # Copy the source code into the container
 COPY . .
 
+ENV port=3000
 EXPOSE 3000
 
 RUN templ generate
