@@ -107,6 +107,7 @@ func newDBConn(dbName string) (*gorm.DB, error) {
 }
 
 func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
+	//TODO: this should probably all be concatinated into a single query, to save on db stress.
 	var user User
 	tx := db.conn.Find(&user, "email = ?", email)
 	if tx.Error != nil {

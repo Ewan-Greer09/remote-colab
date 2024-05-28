@@ -9,6 +9,7 @@ require (
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
+	github.com/joho/godotenv v1.5.1
 	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.10
 )

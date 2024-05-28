@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
 	_ "github.com/a-h/templ" // needed to prevent "go mod tidy" from breaking templ functions
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 
 	"github.com/Ewan-Greer09/remote-colab/service/server"
 )
@@ -20,6 +22,12 @@ type Service struct {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		slog.Error("Error loading ENV", "err", err)
+		os.Exit(1)
+	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"

@@ -41,7 +41,7 @@
 
 [ ] Feat
 [ ] Create Config package
-[ ] Create .env file to store sensitive data
+[x] Create .env file to store sensitive data
 
 [ ] Feat: Live video streaming with WebRTC (might need a webcam to make this work)
 [ ] Create a page to display a users camera feed and a chat
