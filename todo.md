@@ -13,6 +13,17 @@
 [x] Allow users to be invited to a chat
 [x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
 
+[ ] Feat: login
+[ ] When a user logs in certain fields should / should not be shown (login button, etc)
+[ ] Add auth with login redirect to routes that need it
+[ ] Add link to register from login page and reverse
+
+[ ] Feat: Chat
+[ ] Dont render messages with no/invisible content
+[ ] Add emoji support
+[ ] Scroll bar should move to the bottom of the chat window when a HTMX request is completed
+[ ] Ensure rooms display all data correctly
+
 [ ] Feat: Team space
 [ ] Create create team page
 [ ] Create page to display a users teams

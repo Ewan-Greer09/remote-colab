@@ -38,6 +38,8 @@ func (h Handler) AvailableRooms(w http.ResponseWriter, r *http.Request) {
 		slog.Info("Could not get rooms for user", "err", err)
 	}
 
+	slog.Info("Room", "Rooms", rooms)
+
 	_ = chat.AvailableRooms(rooms).Render(r.Context(), w)
 }
 
@@ -53,6 +55,7 @@ func (h Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}, email)
 	if err != nil {
 		slog.Error("Could not create room", "err", err)
+		return
 	}
 
 	rooms, err := h.DB.GetChatRoomsByUser(email)

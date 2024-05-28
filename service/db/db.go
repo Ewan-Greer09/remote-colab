@@ -119,6 +119,15 @@ func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
 		return nil, err
 	}
 
+	var members []User
+	for i := range rooms {
+		err = db.conn.Model(&rooms[i]).Association("Members").Find(&members)
+		if err != nil {
+			return nil, err
+		}
+		rooms[i].Members = members
+	}
+
 	return rooms, nil
 }
 
