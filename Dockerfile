@@ -18,5 +18,7 @@ RUN go mod download
 # Copy the source code into the container
 COPY . .
 
+EXPOSE 3000
+
 # Set the entrypoint command to run the application with Air
-ENTRYPOINT ["air", "-c", ".air.toml"]
+ENTRYPOINT ["go", "run", "./..."]
