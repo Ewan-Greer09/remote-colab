@@ -11,6 +11,7 @@
 [x] Store messages in a database so they can be persited when a user leaves or joins a chat
 [x] Firgure out how to handle multiiple chat rooms
 [x] Allow users to be invited to a chat
+[x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
 
 [ ] Feat: Team space
 [ ] Create create team page
