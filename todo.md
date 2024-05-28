@@ -4,8 +4,6 @@
 [x] Serve public dir to provide css, js and images to the frontend
 [x] Create Handler type for serving views and a seperate one for serving data
 [x] Create DB schema for user data storage
-[ ] Create Config package
-[ ] Create .env file to store sensitive data
 [ ] Consider storing images outside the repo to reduce project size
 [x] Add users email to site cookie, and store it in req context when a message happens
 [x] Style login screen
@@ -24,3 +22,14 @@
 [ ] Create page
 [ ] User should have a profile image
 [ ] User should be able to modify the details of their profile from this page
+
+[ ] Feat: Error handling
+[ ] Create an error page that can be displayed when neccisary
+[ ] Create some error cards/divs that can be used in various scenarios to indicate where failures have occured
+
+[ ] Feat
+[ ] Create Config package
+[ ] Create .env file to store sensitive data
+
+[ ] Feat: Live video streaming with WebRTC (might need a webcam to make this work)
+[ ] Create a page to display a users camera feed and a chat
