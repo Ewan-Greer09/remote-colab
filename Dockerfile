@@ -20,5 +20,7 @@ COPY . .
 
 EXPOSE 3000
 
+RUN templ generate
+
 # Set the entrypoint command to run the application with Air
 ENTRYPOINT ["go", "run", "./..."]
