@@ -12,9 +12,10 @@
 [x] Firgure out how to handle multiiple chat rooms
 [x] Allow users to be invited to a chat
 [x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
+[ ] Migrate to Postgres + Reddis Database
 
-[ ] Feat: login
-[ ] When a user logs in certain fields should / should not be shown (login button, etc)
+[ ] Feat: Login
+[x] When a user logs in certain fields should / should not be shown (login button, etc)
 [ ] Add auth with login redirect to routes that need it
 [ ] Add link to register from login page and reverse
 

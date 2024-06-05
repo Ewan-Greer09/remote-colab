@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -18,7 +19,7 @@ type Server struct {
 
 func NewServer(addr string, handler http.Handler) *Server {
 	if len(addr) < 4 {
-		panic("addr is incorrect length")
+		slog.Error("Server Address", "Length is invalid", len(addr))
 	}
 
 	return &Server{

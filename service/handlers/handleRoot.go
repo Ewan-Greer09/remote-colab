@@ -8,18 +8,30 @@ import (
 	"github.com/go-chi/render"
 
 	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
+	"github.com/Ewan-Greer09/remote-colab/views/components"
 	"github.com/Ewan-Greer09/remote-colab/views/index"
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	var username string
+	var loggedIn bool
 	for _, cookie := range r.Cookies() {
 		if cookie.Name == m.AuthCookieName {
 			username = cookie.Value
 		}
 	}
 
-	err := index.Page(username).Render(context.Background(), w)
+	if username != "" {
+		loggedIn = true
+	}
+
+	err := index.Page(index.IndexData{
+		IntroText: "This is some intro text.",
+		HeaderData: components.HeaderData{
+			Username:   username,
+			IsLoggedIn: loggedIn,
+		},
+	}).Render(context.Background(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}
