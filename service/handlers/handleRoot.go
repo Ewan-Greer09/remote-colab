@@ -25,13 +25,11 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 		loggedIn = true
 	}
 
-	err := index.Page(index.IndexData{
-		IntroText: "This is some intro text.",
-		HeaderData: components.HeaderData{
+	err := index.Page(
+		components.HeaderData{
 			Username:   username,
 			IsLoggedIn: loggedIn,
-		},
-	}).Render(context.Background(), w)
+		}).Render(context.Background(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}

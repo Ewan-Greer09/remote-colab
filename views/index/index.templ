@@ -4,11 +4,10 @@ import "github.com/Ewan-Greer09/remote-colab/views/components"
 import "fmt"
 
 type IndexData struct {
-	IntroText  string
-	HeaderData components.HeaderData
+	IntroText string
 }
 
-templ Page(data IndexData) {
+templ Page(data components.HeaderData) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -21,7 +20,7 @@ templ Page(data IndexData) {
 			<link rel="stylesheet" href="/public/css/index.css"/>
 		</head>
 		<body>
-			@components.Header(data.HeaderData)
+			@components.Header(data)
 			<div hx-get="/index/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
 		</body>
 	</html>
