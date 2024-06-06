@@ -12,7 +12,10 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		slog.Info("Could not load env file", "err", err)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
