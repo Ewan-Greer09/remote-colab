@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/render"
 	"gorm.io/gorm"
 
-	"github.com/Ewan-Greer09/remote-colab/service/db"
+	"github.com/Ewan-Greer09/remote-colab/internal/db"
 	"github.com/Ewan-Greer09/remote-colab/views/register"
 )
 

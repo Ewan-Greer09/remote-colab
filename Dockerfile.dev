@@ -24,7 +24,7 @@ RUN go mod download
 
 # Copy the source code into the container
 COPY . .
-RUN npx tailwindcss -i ./service/public/css/index.css -o ./service/public/css/output.css
+RUN npx tailwindcss -i ./internal/public/css/index.css -o ./internal/public/css/output.css
 
 # Set the entrypoint command to run the application with Air
 ENTRYPOINT ["air", "-c", ".air.toml"]

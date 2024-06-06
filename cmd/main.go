@@ -8,10 +8,10 @@ import (
 	_ "github.com/a-h/templ" // needed to prevent "go mod tidy" from breaking templ functions
 	"github.com/joho/godotenv"
 
-	"github.com/Ewan-Greer09/remote-colab/service/server"
+	"github.com/Ewan-Greer09/remote-colab/internal/server"
 )
 
-type Service struct {
+type internal struct {
 	server.Server
 	// db, emailer, etc...
 }

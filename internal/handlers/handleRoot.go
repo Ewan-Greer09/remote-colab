@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/render"
 
-	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
+	m "github.com/Ewan-Greer09/remote-colab/internal/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/index"
 )
 

@@ -8,9 +8,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
-	"github.com/Ewan-Greer09/remote-colab/service/db"
-	"github.com/Ewan-Greer09/remote-colab/service/handlers"
-	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
+	"github.com/Ewan-Greer09/remote-colab/internal/db"
+	"github.com/Ewan-Greer09/remote-colab/internal/handlers"
+	m "github.com/Ewan-Greer09/remote-colab/internal/middleware"
 )
 
 type Server struct {
@@ -74,7 +74,7 @@ func NewHandler() http.HandlerFunc {
 	r.Get("/register/submit", h.RegisterUser)
 
 	// Serve static files
-	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./service/public"))))
+	r.Handle("/public/*", http.StripPrefix("/public/", http.FileServer(http.Dir("./internal/public"))))
 
 	return r.ServeHTTP
 }

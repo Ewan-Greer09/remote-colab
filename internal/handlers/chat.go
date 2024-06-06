@@ -9,22 +9,27 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
-	"github.com/Ewan-Greer09/remote-colab/service/db"
-	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
+	"github.com/Ewan-Greer09/remote-colab/internal/db"
+	m "github.com/Ewan-Greer09/remote-colab/internal/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/chat"
 )
 
 func (h Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
-	email := r.Context().Value(m.UsernameKey).(string)
-
-	u, err := h.DB.GetUser(email)
-	if err != nil {
-		slog.Error("oops")
+	email, ok := r.Context().Value(m.UsernameKey).(string)
+	if !ok {
+		slog.Error("Could not convert to string", "key", m.UsernameKey)
 		return
 	}
 
-	err = chat.ChatPage(u.Email).Render(r.Context(), w)
+	u, err := h.DB.GetUser(email)
+	if err != nil {
+		slog.Error("Could not get user", "err", err)
+		return
+	}
+
+	err = chat.ChatPage("TeamWork - Chat", u.Email, true).Render(r.Context(), w)
 	if err != nil {
 		log.Print(err)
 		return
@@ -34,11 +39,11 @@ func (h Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
 func (h Handler) AvailableRooms(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "username")
 	rooms, err := h.DB.GetChatRoomsByUser(user)
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		slog.Info("Could not get rooms for user", "err", err)
 	}
 
-	slog.Info("Room", "Rooms", rooms)
+	slog.Info("Available Rooms", "Rooms", rooms)
 
 	_ = chat.AvailableRooms(rooms).Render(r.Context(), w)
 }
@@ -69,9 +74,7 @@ func (h Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) ChatRoom(w http.ResponseWriter, r *http.Request) {
 	roomId := chi.URLParam(r, "uid")
-	username := r.Context().Value(m.UsernameKey).(string)
-
-	_ = chat.ChatRoom(username, roomId).Render(r.Context(), w)
+	_ = chat.ChatRoom("TeamWork - Chat", roomId, true).Render(r.Context(), w)
 }
 
 func (h Handler) ChatWindow(w http.ResponseWriter, r *http.Request) {
