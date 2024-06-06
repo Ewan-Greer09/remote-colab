@@ -12,6 +12,19 @@
 [x] Firgure out how to handle multiiple chat rooms
 [x] Allow users to be invited to a chat
 [x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
+[ ] Migrate to Postgres + Reddis Database
+[ ] IsAuthed middleware to ensure that a user is authed before allowing them on certain routes
+
+[ ] Feat: Login
+[x] When a user logs in certain fields should / should not be shown (login button, etc)
+[ ] Add auth with login redirect to routes that need it
+[ ] Add link to register from login page and reverse
+
+[ ] Feat: Chat
+[ ] Dont render messages with no/invisible content
+[ ] Add emoji support
+[ ] Scroll bar should move to the bottom of the chat window when a HTMX request is completed
+[ ] Ensure rooms display all data correctly
 
 [ ] Feat: Team space
 [ ] Create create team page
@@ -30,7 +43,7 @@
 
 [ ] Feat
 [ ] Create Config package
-[ ] Create .env file to store sensitive data
+[x] Create .env file to store sensitive data
 
 [ ] Feat: Live video streaming with WebRTC (might need a webcam to make this work)
 [ ] Create a page to display a users camera feed and a chat

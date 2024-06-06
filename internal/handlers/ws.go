@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 
-	"github.com/Ewan-Greer09/remote-colab/service/db"
+	"github.com/Ewan-Greer09/remote-colab/internal/db"
 	"github.com/Ewan-Greer09/remote-colab/views/chat"
 )
 

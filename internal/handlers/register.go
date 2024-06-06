@@ -7,12 +7,12 @@ import (
 	"github.com/go-chi/render"
 	"gorm.io/gorm"
 
-	"github.com/Ewan-Greer09/remote-colab/service/db"
+	"github.com/Ewan-Greer09/remote-colab/internal/db"
 	"github.com/Ewan-Greer09/remote-colab/views/register"
 )
 
 func (h *Handler) RegisterUserPage(w http.ResponseWriter, r *http.Request) {
-	err := register.Page().Render(r.Context(), w)
+	err := register.Page("TeamWork - Register", false).Render(r.Context(), w)
 	if err != nil {
 		render.HTML(w, r, "<p>There was an issue</p>")
 	}

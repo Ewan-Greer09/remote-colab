@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-chi/render"
 
-	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
+	m "github.com/Ewan-Greer09/remote-colab/internal/middleware"
 	"github.com/Ewan-Greer09/remote-colab/views/login"
 )
 
 func HandleLoginPage(w http.ResponseWriter, r *http.Request) {
-	err := login.Page().Render(r.Context(), w)
+	err := login.Page("TeamWork - Login", false).Render(r.Context(), w)
 	if err != nil {
 		login.Error("Could not load page.").Render(r.Context(), w)
 	}
@@ -51,7 +51,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &cookie)
-	w.Header().Add("HX-Location", "/")
+	w.Header().Add("HX-Location", "/teams")
 }
 
 func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {

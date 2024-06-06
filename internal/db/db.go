@@ -107,6 +107,7 @@ func newDBConn(dbName string) (*gorm.DB, error) {
 }
 
 func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
+	//TODO: this should probably all be concatinated into a single query, to save on db stress.
 	var user User
 	tx := db.conn.Find(&user, "email = ?", email)
 	if tx.Error != nil {
@@ -117,6 +118,15 @@ func (db Database) GetChatRoomsByUser(email string) ([]ChatRoom, error) {
 	err := db.conn.Model(&user).Association("ChatRooms").Find(&rooms)
 	if err != nil {
 		return nil, err
+	}
+
+	var members []User
+	for i := range rooms {
+		err = db.conn.Model(&rooms[i]).Association("Members").Find(&members)
+		if err != nil {
+			return nil, err
+		}
+		rooms[i].Members = members
 	}
 
 	return rooms, nil

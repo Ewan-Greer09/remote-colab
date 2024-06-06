@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./bin/main"
-  cmd = "templ generate && go build -o ./bin/main ./cmd/main.go"
+  cmd = "templ generate && npx tailwindcss -i ./internal/public/css/index.css -o ./internal/public/css/output.css && go build -o ./bin/main ./cmd/main.go"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "data", "grafana", "node_modules"]
   exclude_file = []

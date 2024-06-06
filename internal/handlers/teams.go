@@ -11,7 +11,7 @@ import (
 )
 
 func HandleTeamsPage(w http.ResponseWriter, r *http.Request) {
-	err := teams.Page().Render(context.Background(), w)
+	err := teams.Page("TeamWork - Teams", true).Render(context.Background(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}
