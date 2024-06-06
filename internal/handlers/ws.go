@@ -69,7 +69,7 @@ func (room *Room) run() {
 			clientsMu.Unlock()
 
 		case message := <-room.broadcast:
-			if message.ChatRoom.UID == room.Id {
+			if message.ChatRoom.UID == room.Id && message.Content != "" {
 				var buf bytes.Buffer
 				_ = chat.Message(chat.MessageProps{
 					Content:  message.Content,
