@@ -114,11 +114,11 @@ templ AvailableRooms(rooms []db.ChatRoom) {
 }
 
 templ RoomCard(room db.ChatRoom) {
-	<li class="cursor-pointer p-2 m-1 border-2 border-slate-600 text-slate-700 rounded-md hover:text-white hover:bg-slate-500 ease-in-out">
-		<a href={ templ.SafeURL(fmt.Sprintf("/chat/room/%s", room.UID)) }>
-			Name: { fmt.Sprint(room.Name) }
+	<li class="cursor-pointer p-4 m-2 border-2 border-gray-500 rounded-md text-black bg-white hover:bg-gray-500 ease-in-out shadow-md hover:text-white">
+		<a href={ templ.SafeURL(fmt.Sprintf("/chat/room/%s", room.UID)) } class="block text-inherit hover:text-inherit">
+			<span class="font-bold">Name:</span> { fmt.Sprint(room.Name) }
+			<br/>
+			<span class="font-bold">Members:</span> { fmt.Sprint(len(room.Members)) }
 		</a>
-		<br/>
-		Members: { fmt.Sprint(len(room.Members)) }
 	</li>
 }
