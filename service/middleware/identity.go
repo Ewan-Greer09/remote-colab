@@ -8,8 +8,10 @@ import (
 type contextKey string
 
 const (
-	UsernameKey    contextKey = "username"
-	AuthCookieName string     = "colab-auth"
+	UsernameKey     contextKey = "username"
+	AuthCookieName  string     = "colab-auth"
+	AuthedKey       contextKey = "authed"
+	DefaultUsername string     = "Undefined"
 )
 
 func Identity(next http.Handler) http.Handler {
@@ -22,8 +24,19 @@ func Identity(next http.Handler) http.Handler {
 		}
 
 		if username == "" {
-			username = "Undefined"
+			username = DefaultUsername
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UsernameKey, username)))
+	})
+}
+
+func Auth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if len(r.Context().Value(UsernameKey).(string)) < 3 || r.Context().Value(UsernameKey).(string) == DefaultUsername {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), AuthedKey, true)))
 	})
 }

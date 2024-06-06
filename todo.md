@@ -13,6 +13,7 @@
 [x] Allow users to be invited to a chat
 [x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
 [ ] Migrate to Postgres + Reddis Database
+[ ] IsAuthed middleware to ensure that a user is authed before allowing them on certain routes
 
 [ ] Feat: Login
 [x] When a user logs in certain fields should / should not be shown (login button, etc)

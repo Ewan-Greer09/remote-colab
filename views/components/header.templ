@@ -1,13 +1,6 @@
 package components
 
-import "fmt"
-
-type HeaderData struct {
-	Username   string
-	IsLoggedIn bool
-}
-
-templ Header(data HeaderData) {
+templ Header(authed bool) {
 	<header class="justify-between flex flex-row p-4">
 		<div id="logo" class="px-4 flex flex-col ">
 			<img src="/public/img/business_logo.png" alt="Profile Photo" class="rounded-full"/>
@@ -16,76 +9,75 @@ templ Header(data HeaderData) {
 			<ul class="flex flex-row">
 				<li class="p-4">
 					<a href="/" class="flex flex-row">
-						<span class="material-symbols-outlined pr-1">
+						<span class="material-symbols-outlined pr-1 text-black">
 							home
 						</span>
-						<span class="hover:underline">Home</span>
+						<span class="hover:underline text-black">Home</span>
 					</a>
 				</li> // landing page
-				if data.IsLoggedIn {
+				<li class="p-4">
+					<a href="/teams" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1 text-black">
+							groups
+						</span>
+						<span class="hover:underline text-black">Teams</span>
+					</a>
+				</li> // page view area
+				<li class="p-4">
+					<a href="/profile" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1 text-black">
+							person
+						</span>
+						<span class="hover:underline text-black">Profile</span>
+					</a>
+				</li> // personal public profile
+				<li class="p-4">
+					<a href="/settings" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1 text-black">
+							settings 
+						</span>
+						<span class="hover:underline text-black">Settings</span>
+					</a>
+				</li> // settings (account, etc)
+				<li class="p-4">
+					<a href="/chat" class="flex flex-row">
+						<span class="material-symbols-outlined pr-1 text-black">
+							chat
+						</span>
+						<span class="hover:underline text-black">chat</span>
+					</a>
+				</li> // Chat
+				if !authed {
 					<li class="p-4">
-						<a href="/teams" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								groups
-							</span>
-							<span class="hover:underline">Teams</span>
-						</a>
-					</li> // page view area
-					<li class="p-4">
-						<a href="/profile" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								person
-							</span>
-							<span class="hover:underline">Profile</span>
-						</a>
-					</li> // personal public profile
-					<li class="p-4">
-						<a href="/settings" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								settings 
-							</span>
-							<span class="hover:underline">Settings</span>
-						</a>
-					</li> // settings (account, etc)
-					<li class="p-4">
-						<a href="/chat" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								chat
-							</span>
-							<span class="hover:underline">chat</span>
-						</a>
-					</li> // Chat
-					<li class="p-4">
-						<a href="/logout" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								logout 
-							</span>
-							<span class="hover:underline">Logout</span>
-						</a>
-					</li> // Logout
-				} else {
-					<li class="p-4">
-						<a href="/login" class="flex flex-row">
+						<a href="/login" class="flex flex-row text-black">
 							<span class="material-symbols-outlined pr-1">
 								login 
 							</span>
-							<span class="hover:underline">Login</span>
+							<span class="hover:underline text-black">Login</span>
 						</a>
-					</li> // Login
+					</li> // login
 					<li class="p-4">
 						<a href="/register" class="flex flex-row">
-							<span class="material-symbols-outlined pr-1">
-								how_to_reg
+							<span class="material-symbols-outlined pr-1 text-black">
+								how_to_reg 
 							</span>
-							<span class="hover:underline">Register</span>
+							<span class="hover:underline text-black">Register</span>
 						</a>
-					</li> // Register
+					</li> // register
+				} else {
+					<li class="p-4">
+						<a hx-get="/logout" class="flex flex-row cursor-pointer">
+							<span class="material-symbols-outlined pr-1 text-black">
+								logout 
+							</span>
+							<span class="hover:underline text-black">Logout</span>
+						</a>
+					</li> // Logout
 				}
 			</ul>
 		</nav>
 		<div id="user-info" class="px-4 flex flex-col">
 			<img src="https://placehold.co/50" alt="Profile Photo" class="m-auto h-12 max-w-12 rounded-full"/>
-			<div><p id="username">{ fmt.Sprint(data.Username) }</p></div>
 		</div>
 	</header>
 }

@@ -2,27 +2,14 @@ package register
 
 import "github.com/Ewan-Greer09/remote-colab/views/components"
 
-templ Page() {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Register</title>
-			<script src="/public/js/htmx.js"></script>
-			<script src="https://cdn.tailwindcss.com"></script>
-			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
-			<link rel="stylesheet" href="/public/css/index.css"/>
-		</head>
-		<body>
-			@components.Header(components.HeaderData{Username: "John Doe", IsLoggedIn: false})
-			<div hx-get="/register/content" hx-swap="innerHTML" hx-trigger="load" hx-target="this"></div>
-		</body>
-	</html>
+templ Page(title string, authed bool) {
+	@components.Base(title, authed) {
+		@Content()
+	}
 }
 
 templ Content() {
-	<main class="flex flex-col items-center bg-gray-100">
+	<main class="flex flex-col items-center bg-gray-100 h-screen">
 		<div class="border-2 border-gray-500 rounded-md p-4">
 			<h1 class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900">Register</h1>
 			<form hx-get="/register/submit" hx-target="#error" hx-swap="outerHTML" class="flex flex-col">

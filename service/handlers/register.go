@@ -12,7 +12,7 @@ import (
 )
 
 func (h *Handler) RegisterUserPage(w http.ResponseWriter, r *http.Request) {
-	err := register.Page().Render(r.Context(), w)
+	err := register.Page("TeamWork - Register", false).Render(r.Context(), w)
 	if err != nil {
 		render.HTML(w, r, "<p>There was an issue</p>")
 	}

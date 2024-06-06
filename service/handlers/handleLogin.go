@@ -11,7 +11,7 @@ import (
 )
 
 func HandleLoginPage(w http.ResponseWriter, r *http.Request) {
-	err := login.Page().Render(r.Context(), w)
+	err := login.Page("TeamWork - Login", false).Render(r.Context(), w)
 	if err != nil {
 		login.Error("Could not load page.").Render(r.Context(), w)
 	}

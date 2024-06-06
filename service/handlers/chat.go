@@ -24,7 +24,7 @@ func (h Handler) ChatPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = chat.ChatPage(u.Email, u.DisplayName).Render(r.Context(), w)
+	err = chat.ChatPage(u.Email).Render(r.Context(), w)
 	if err != nil {
 		log.Print(err)
 		return

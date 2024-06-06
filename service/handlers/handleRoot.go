@@ -1,14 +1,12 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
 
 	m "github.com/Ewan-Greer09/remote-colab/service/middleware"
-	"github.com/Ewan-Greer09/remote-colab/views/components"
 	"github.com/Ewan-Greer09/remote-colab/views/index"
 )
 
@@ -25,22 +23,18 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 		loggedIn = true
 	}
 
-	err := index.Page(
-		components.HeaderData{
-			Username:   username,
-			IsLoggedIn: loggedIn,
-		}).Render(context.Background(), w)
+	err := index.Page("TeamWork - Home", loggedIn).Render(r.Context(), w)
 	if err != nil {
 		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
 	}
 }
 
 func HandleRootContent(w http.ResponseWriter, r *http.Request) {
-	data := index.IndexData{}
-	data.IntroText = "This is some intro text for the index page. This will eventually be a team management tool."
+	// data := index.IndexData{}
+	// data.IntroText = "This is some intro text for the index page. This will eventually be a team management tool."
 
-	err := index.Content(data).Render(context.Background(), w)
-	if err != nil {
-		render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
-	}
+	// err := index.Content(data).Render(context.Background(), w)
+	// if err != nil {
+	// 	render.JSON(w, r, fmt.Errorf("there was an issue: %w", err))
+	// }
 }
