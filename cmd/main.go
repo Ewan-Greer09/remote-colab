@@ -19,6 +19,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
+		slog.Info("could not get port from env")
 		port = "3000"
 	}
 
