@@ -11,17 +11,8 @@ import (
 	"github.com/Ewan-Greer09/remote-colab/internal/server"
 )
 
-type internal struct {
-	server.Server
-	// db, emailer, etc...
-}
-
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		slog.Error("Load Env", "err", err)
-		os.Exit(1)
-	}
+	_ = godotenv.Load()
 
 	port := os.Getenv("PORT")
 	if port == "" {
