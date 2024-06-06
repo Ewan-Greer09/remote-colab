@@ -12,24 +12,24 @@ templ Page(title string, authed bool) {
 	}
 }
 
-//TODO: need to update this to make it a functional form with good place for error messages to be presented
 templ Content() {
-	<main class="flex flex-col items-center bg-gray-100 h-screen">
-		<div class="border-2 border-gray-500 rounded-md p-4">
-			<h1 class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900">Login</h1>
-			<form hx-get="/login/submit" hx-target="#error" hx-swap="outerHTML" class="flex flex-col">
-				<div class="justify-between flex flex-row">
-					<label for="email" class="my-auto">Email:</label>
-					<input type="email" name="email-address" id="email-input" class="p-1 m-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
-				</div>
-				<span>
-					<label for="password">Password:</label>
-					<input type="password" name="password" id="password-input" class="p-1 m-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
-				</span>
-				<p id="error"></p>
-				<button type="submit" class="bg-gray-500 text-white rounded-md border-2 border-gray-800 hover:bg-gray-800 ease-in-out">Submit</button>
-			</form>
-		</div>
+	<main class="flex flex-col items-center h-screen p-6">
+		<h1 class="mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900">Login</h1>
+		<form hx-get="/login/submit" hx-target="#error" hx-swap="outerHTML" class="flex flex-col bg-white p-6 rounded-lg shadow-md">
+			<div class="flex flex-col mb-4">
+				<label for="email" class="mb-2 text-lg">Email:</label>
+				<input type="email" name="email-address" id="email-input" class="p-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
+			</div>
+			<div class="flex flex-col mb-4">
+				<label for="password" class="mb-2 text-lg">Password:</label>
+				<input type="password" name="password" id="password-input" class="p-2 border-2 border-gray-400 rounded-md" hx-validate="true" required/>
+			</div>
+			<p id="error" class="text-red-500 mb-4"></p>
+			<div class="flex flex-row justify-between space-x-2 items-center">
+				<a href="/register" class="text-blue-500 hover:underline">Don't have an account?</a>
+				<button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Login</button>
+			</div>
+		</form>
 	</main>
 }
 

@@ -51,7 +51,7 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &cookie)
-	w.Header().Add("HX-Location", "/")
+	w.Header().Add("HX-Location", "/teams")
 }
 
 func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {

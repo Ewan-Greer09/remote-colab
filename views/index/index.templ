@@ -3,10 +3,14 @@ package index
 import "github.com/Ewan-Greer09/remote-colab/views/components"
 
 templ titleSection() {
-	<main class="h-screen">
-		<div class="flex flex-col items-center p-20">
-			<h1><b>TeamWork</b> is a tool to help teams collaborate, internally and together.</h1>
-			<h3>Sign in or register to get started</h3>
+	<main class="h-screen flex flex-col items-center">
+		<div class="flex flex-col items-center p-20 text-center">
+			<h1><b>TeamWork</b>&#8482; is a tool to help teams collaborate, internally and together.</h1>
+			<h3>Sign in or Register to get started</h3>
+		</div>
+		<div class="flex flex-row space-x-4">
+			<a href="/login" class="px-4 py-2 bg-blue-500 text-white rounded">Login</a>
+			<a href="/register" class="px-4 py-2 bg-green-500 text-white rounded">Register</a>
 		</div>
 	</main>
 }
