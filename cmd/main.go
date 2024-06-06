@@ -22,6 +22,8 @@ func main() {
 		port = "3000"
 	}
 
+	slog.Info("Server Running", "port", port)
+
 	s := server.NewServer(fmt.Sprintf("0.0.0.0:%s", port), server.NewHandler())
 	if err := s.ListenAndServe(); err != nil {
 		slog.Error("Listen and Serve", "err", err)
