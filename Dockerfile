@@ -4,6 +4,11 @@ FROM golang:1.22
 RUN go install github.com/air-verse/air@latest
 RUN go install github.com/a-h/templ/cmd/templ@latest 
 
+# Install npm and tailwindcss
+RUN apt-get update && apt-get install -y npm \
+    && apt-get clean
+RUN npm install -g tailwindcss
+
 # Set the working directory inside the container
 WORKDIR /app
 
