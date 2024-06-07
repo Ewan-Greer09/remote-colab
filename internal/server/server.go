@@ -48,8 +48,10 @@ func NewHandler() http.HandlerFunc {
 	r.Group(func(r chi.Router) {
 		r.Use(m.Auth)
 
-		r.Get("/teams", handlers.HandleTeamsPage)
-		r.Get("/teams/content", handlers.HandleTeamsContent)
+		r.Get("/teams", h.HandleTeamsPage)
+		r.Get("/teams/submit", h.HandleCreateTeam)
+		r.Delete("/teams/{id}", h.DeleteTeam)
+		r.Get("/teams/list", h.TeamsList)
 
 		r.Get("/logout", h.Logout)
 
