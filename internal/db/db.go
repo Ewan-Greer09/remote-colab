@@ -14,7 +14,8 @@ type User struct {
 	Password    string `gorm:"default:null"`
 	DisplayName string `gorm:"default:null"`
 
-	Teams []Team `gorm:"many2many:team_members;"`
+	Teams     []Team     `gorm:"many2many:team_members;"`
+	ChatRooms []ChatRoom `gorm:"many2many:chat_room_members"`
 }
 
 type ChatRoom struct {

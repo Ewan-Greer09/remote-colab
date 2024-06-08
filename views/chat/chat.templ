@@ -27,11 +27,7 @@ type ChatWindowProps struct {
 
 templ ChatWindow(props ChatWindowProps) {
 	<main class="flex flex-col items-center bg-gray-100">
-		<form hx-get="/chat/invite">
-			<input type="text" name="invitee" id="inivte-text"/>
-			<input type="text" name="roomId" value={ props.RoomID } hidden/>
-			<button type="submit">Invite</button>
-		</form>
+		@InviteForm(props.RoomID)
 		<div id="chat-room" class="w-full max-w-md mx-auto my-4 bg-white shadow-md rounded-lg overflow-hidden">
 			<ul class="divide-y divide-gray-200 h-[500px] max-h-[500px] scroll-auto overflow-y-scroll" id="messages">
 				for _, message := range props.Messages {
@@ -121,4 +117,12 @@ templ RoomCard(room db.ChatRoom) {
 			<span class="font-bold">Members:</span> { fmt.Sprint(len(room.Members)) }
 		</a>
 	</li>
+}
+
+templ InviteForm(roomId string) {
+	<form hx-get="/chat/invite" hx-target="this" hx-swap="outerHTML">
+		<input type="text" name="invitee" id="inivte-text"/>
+		<input type="text" name="roomId" value={ roomId } hidden/>
+		<button type="submit">Invite</button>
+	</form>
 }

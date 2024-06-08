@@ -107,6 +107,7 @@ func (h Handler) Invite(w http.ResponseWriter, r *http.Request) {
 	u, err := h.DB.GetUser(email)
 	if err != nil {
 		slog.Error("Could not get user", "err", err)
+		_ = chat.InviteForm(roomId).Render(r.Context(), w)
 		return
 	}
 
@@ -114,4 +115,6 @@ func (h Handler) Invite(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Could not update room", "err", err)
 	}
+
+	_ = chat.InviteForm(roomId).Render(r.Context(), w)
 }
