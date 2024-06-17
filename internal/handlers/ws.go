@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
@@ -71,11 +70,14 @@ func (room *Room) run() {
 		case message := <-room.broadcast:
 			if message.ChatRoom.UID == room.Id && message.Content != "" {
 				var buf bytes.Buffer
-				_ = chat.Message(chat.MessageProps{
-					Content:  message.Content,
-					Username: message.Author,
-					Time:     time.Now(),
-				}).Render(context.Background(), &buf)
+				err := chat.Message(
+					message.Author,
+					message.Author,
+					message.Content,
+				).Render(context.Background(), &buf)
+				if err != nil {
+					slog.Error("Broadcast", "err", err)
+				}
 
 				clientsMu.Lock()
 				cl := room.clients
@@ -92,7 +94,7 @@ func (room *Room) run() {
 				}
 				clientsMu.Unlock()
 
-				err := room.Handler.DB.CreateMessage(room.Id, message.Author, message.Content)
+				err = room.Handler.DB.CreateMessage(room.Id, message.Author, message.Content)
 				if err != nil {
 					slog.Error("Could not create message", "err", err)
 				}
