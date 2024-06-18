@@ -35,6 +35,18 @@ type Message struct {
 	ChatRoom ChatRoom `gorm:"foreignKey:ChatRoomID;references:ID"`
 }
 
+func NewMessage(content string, author string, roomID string, roomName string) *Message {
+	return &Message{
+		Content: content,
+		Author:  author,
+		ChatRoom: ChatRoom{
+			UID:  roomID,
+			Name: roomName,
+		},
+		ChatRoomID: roomID,
+	}
+}
+
 type Team struct {
 	gorm.Model
 	UID         string `gorm:"uniqueIndex"`

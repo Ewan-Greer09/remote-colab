@@ -14,6 +14,9 @@
 [x] Install HTMX locally (store HTMX file in /js, or install with NPM/Node)
 [ ] Migrate to Postgres + Reddis Database
 [x] IsAuthed middleware to ensure that a user is authed before allowing them on certain routes
+[ ] Create logger for use within project to assist with consistency
+[ ] Use SQLC to generate and manage database queries. GORM is fine for small things, but becomes messy with more complex queries. Note: bun could also be investigated in conjunction with goose.
+[ ] Upgrade to HTMX v2 <!-- *This should be done soon as it is core the the applications function -->
 
 [x] Feat: Login
 [x] When a user logs in certain fields should / should not be shown (login button, etc)
