@@ -19,8 +19,15 @@ func (h Handler) NewChatPage(w http.ResponseWriter, r *http.Request) {
 		slog.Error("could not get rooms", "err", err)
 		return
 	}
-
-	messages, err := h.DB.GetMessagesByRoomUID(rooms[0].UID)
+	
+	var r db.Room
+	if len(room) < 1 {
+		r = Room{}
+	} else {
+		r = rooms[0].UID
+	}
+	
+	messages, err := h.DB.GetMessagesByRoomUID(r)
 	if err != nil {
 		slog.Error("could not get messages from room", "err", err, "room", rooms[0].UID)
 	}
