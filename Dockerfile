@@ -2,7 +2,7 @@
 FROM golang:1.22
 
 RUN go install github.com/air-verse/air@latest
-RUN go install github.com/a-h/templ/cmd/templ@latest 
+RUN go install github.com/a-h/templ/cmd/templ@v0.2.680
 
 # Install npm and tailwindcss
 RUN apt-get update && apt-get install -y npm \
