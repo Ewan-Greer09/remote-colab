@@ -48,18 +48,22 @@ func NewHandler() http.HandlerFunc {
 	r.Group(func(r chi.Router) {
 		r.Use(m.Auth)
 
-		r.Get("/teams", handlers.HandleTeamsPage)
-		r.Get("/teams/content", handlers.HandleTeamsContent)
+		r.Get("/teams", h.HandleTeamsPage)
+		r.Get("/teams/submit", h.HandleCreateTeam)
+		r.Delete("/teams/{id}", h.DeleteTeam)
+		r.Get("/teams/list", h.TeamsList)
 
 		r.Get("/logout", h.Logout)
 
-		r.Get("/chat", h.ChatPage)
-		r.Get("/chat/available-rooms/{username}", h.AvailableRooms)
+		r.Get("/chat", h.NewChatPage)
+		// r.Get("/chat/available-rooms/{username}", h.AvailableRooms)
 		r.Get("/chat/room/{uid}", h.ChatRoom)
-		r.Get("/chat/room/window/{uid}", h.ChatWindow)
-		r.Get("/chat/connect/{uid}", h.Room)
-		r.Get("/chat/create", h.CreateRoom)
+		// r.Get("/chat/room/window/{uid}", h.ChatWindow)
+		r.Get("/chat/connect/{uid}", h.HandleRoomConnection)
+		// r.Get("/chat/create", h.CreateRoom)
 		r.Get("/chat/invite", h.Invite)
+		r.Get("/chat/invite-modal", h.InviteModal)
+		r.Get("/chat/invite-modal-hide", h.InviteModalHide)
 	})
 
 	r.Get("/", handlers.HandleRoot)

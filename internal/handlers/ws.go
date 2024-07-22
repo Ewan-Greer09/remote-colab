@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
@@ -16,28 +15,16 @@ import (
 	"github.com/Ewan-Greer09/remote-colab/views/chat"
 )
 
-var upgrade = websocket.Upgrader{
-	ReadBufferSize:  32,
-	WriteBufferSize: 32,
-}
-
 type Room struct {
-	Id         string
-	Name       string
-	Handler    Handler
+	id         string
+	name       string
+	db         *db.Database
 	clients    map[*websocket.Conn]bool
 	broadcast  chan db.Message
 	register   chan *websocket.Conn
 	unregister chan *websocket.Conn
 }
 
-var (
-	roomStore = make(map[string]*Room)
-	roomsMu   sync.Mutex
-	clientsMu sync.Mutex
-)
-
-// MessageContent is the struct that will be used to unmarshal the message sent by the client - without this the message is a mess
 type MessageContent struct {
 	ChatMessage string `json:"chat-message"`
 	Username    string `json:"username"`
@@ -50,88 +37,47 @@ type MessageContent struct {
 	} `json:"HEADERS"`
 }
 
-func (room *Room) run() {
-	for {
-		select {
-		case conn := <-room.register:
-			slog.Info("Client connected", "room", room.Id, "RoomName", room.Name)
+var (
+	roomStore = make(map[string]*Room)
+	roomsMu   sync.Mutex
+	clientsMu sync.Mutex
 
-			clientsMu.Lock()
-			room.clients[conn] = true
-			clientsMu.Unlock()
-
-		case conn := <-room.unregister:
-			clientsMu.Lock()
-			if _, ok := room.clients[conn]; ok {
-				delete(room.clients, conn)
-				conn.Close()
-			}
-			clientsMu.Unlock()
-
-		case message := <-room.broadcast:
-			if message.ChatRoom.UID == room.Id && message.Content != "" {
-				var buf bytes.Buffer
-				_ = chat.Message(chat.MessageProps{
-					Content:  message.Content,
-					Username: message.Author,
-					Time:     time.Now(),
-				}).Render(context.Background(), &buf)
-
-				clientsMu.Lock()
-				cl := room.clients
-				slog.Info("Clients in room", "room", room.Id, "clients", len(cl))
-				for conn := range cl {
-					err := conn.WriteMessage(websocket.TextMessage, buf.Bytes())
-					if err != nil {
-						slog.Info("Closing conn", "err", err)
-						conn.Close()
-						delete(room.clients, conn)
-					} else {
-						slog.Info("Message sent", "room", room.Id, "author", message.Author, "RoomName", room.Name)
-					}
-				}
-				clientsMu.Unlock()
-
-				err := room.Handler.DB.CreateMessage(room.Id, message.Author, message.Content)
-				if err != nil {
-					slog.Error("Could not create message", "err", err)
-				}
-			}
-		}
+	upgrade = websocket.Upgrader{
+		ReadBufferSize:  32,
+		WriteBufferSize: 32,
 	}
+)
+
+type ChatRoom interface {
+	run()
 }
 
-func (h Handler) Room(w http.ResponseWriter, r *http.Request) {
-	roomID := chi.URLParam(r, "uid")
+type WsHandler interface {
+	HandleConnections(*Room, http.ResponseWriter, *http.Request)
+}
 
-	slog.Info("Connecting to room", "roomID", roomID)
+func (h Handler) HandleRoomConnection(w http.ResponseWriter, r *http.Request) {
+	roomID := chi.URLParam(r, "uid")
 
 	roomsMu.Lock()
 	room, exists := roomStore[roomID]
+	roomsMu.Unlock()
+
 	if !exists {
-		roomsMu.Unlock()
-		// Load room from database if not in memory
 		rooms, err := h.DB.GetAllRooms()
 		if err != nil {
 			slog.Error("Could not get rooms", "err", err)
-			http.Error(w, "Could not get rooms", http.StatusInternalServerError)
 			return
 		}
 
 		for _, r := range rooms {
 			if r.UID == roomID {
-				room = &Room{
-					Id:         r.UID,
-					Name:       r.Name,
-					Handler:    h, // for database interactions
-					clients:    make(map[*websocket.Conn]bool),
-					broadcast:  make(chan db.Message),
-					register:   make(chan *websocket.Conn),
-					unregister: make(chan *websocket.Conn),
-				}
+				room = newRoom(r.UID, r.Name, h.DB)
+
 				roomsMu.Lock()
 				roomStore[roomID] = room
 				roomsMu.Unlock()
+
 				go room.run()
 				break
 			}
@@ -139,11 +85,8 @@ func (h Handler) Room(w http.ResponseWriter, r *http.Request) {
 
 		if room == nil {
 			slog.Error("Room not found", "roomID", roomID)
-			http.Error(w, "Room not found", http.StatusNotFound)
 			return
 		}
-	} else {
-		roomsMu.Unlock()
 	}
 
 	handleConnections(room, w, r)
@@ -172,16 +115,77 @@ func handleConnections(room *Room, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		m := db.Message{
-			Content: mc.ChatMessage,
-			Author:  mc.Username,
-			ChatRoom: db.ChatRoom{
-				UID:  room.Id,
-				Name: room.Name,
-			},
-			ChatRoomID: room.Id,
-		}
+		room.broadcast <- *db.NewMessage(
+			mc.ChatMessage,
+			mc.Username,
+			room.id,
+			room.name,
+		)
+	}
+}
 
-		room.broadcast <- m
+func (room *Room) run() {
+	for {
+		select {
+		case conn := <-room.register:
+			slog.Info("Client connected", "roomID", room.id, "RoomName", room.name)
+
+			clientsMu.Lock()
+			room.clients[conn] = true
+			clientsMu.Unlock()
+
+		case conn := <-room.unregister:
+			clientsMu.Lock()
+			if _, ok := room.clients[conn]; ok {
+				delete(room.clients, conn)
+				conn.Close()
+			}
+			clientsMu.Unlock()
+
+		case message := <-room.broadcast:
+			if message.ChatRoom.UID == room.id && message.Content != "" {
+				var buf bytes.Buffer
+				err := chat.Message(
+					message.Author,
+					message.Author,
+					message.Content,
+				).Render(context.Background(), &buf)
+				if err != nil {
+					slog.Error("Broadcast", "err", err)
+				}
+
+				clientsMu.Lock()
+				cl := room.clients
+				slog.Info("Clients in room", "room", room.id, "clients", len(cl))
+				for conn := range cl {
+					err := conn.WriteMessage(websocket.TextMessage, buf.Bytes())
+					if err != nil {
+						slog.Info("Closing conn", "err", err)
+						conn.Close()
+						delete(room.clients, conn)
+					} else {
+						slog.Info("Message sent", "roomID", room.id, "author", message.Author, "roomName", room.name)
+					}
+				}
+				clientsMu.Unlock()
+
+				err = room.db.CreateMessage(room.id, message.Author, message.Content)
+				if err != nil {
+					slog.Error("Could not create message", "err", err)
+				}
+			}
+		}
+	}
+}
+
+func newRoom(roomID string, roomName string, conn *db.Database) *Room {
+	return &Room{
+		id:         roomID,
+		name:       roomName,
+		db:         conn,
+		clients:    make(map[*websocket.Conn]bool),
+		broadcast:  make(chan db.Message),
+		register:   make(chan *websocket.Conn),
+		unregister: make(chan *websocket.Conn),
 	}
 }

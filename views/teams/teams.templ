@@ -2,19 +2,74 @@ package teams
 
 import "github.com/Ewan-Greer09/remote-colab/views/components"
 import "fmt"
+import "github.com/Ewan-Greer09/remote-colab/internal/db"
 
-type TeamsData struct {
-	Text string
-}
-
-templ Page(title string, authed bool) {
+templ Page(title string, authed bool, teams []db.Team) {
 	@components.Base(title, authed) {
-		@Content(TeamsData{Text: "This is some placeholder text"})
+		@Content(teams)
 	}
 }
 
-templ Content(data TeamsData) {
-	<main class="flex flex-col items-center bg-gray-100">
-		<p class="text-3xl font-bold underline text-gray-800">{ fmt.Sprint(data.Text) }</p>
+templ Content(teams []db.Team) {
+	<main class="flex flex-col lg:flex-row justify-between gap-6 p-10 mx-10 h-screen">
+		<section class="w-full lg:w-1/2 h-screen">
+			<h2 class="text-2xl font-semibold text-gray-700 mb-4">Your Teams</h2>
+			<button type="button" hx-get="/teams/list" hx-target="#teams-list" hx-swap="outerHTML">
+				<span class="material-symbols-outlined">
+					refresh
+				</span>
+			</button>
+			@TeamsList(teams)
+		</section>
+		<section class="w-full lg:w-1/2">
+			<h2 class="text-2xl font-semibold text-gray-700 mb-4">Create New Team</h2>
+			@CreateTeamForm()
+		</section>
 	</main>
+}
+
+templ CreateTeamForm() {
+	<form hx-get="/teams/submit" class="space-y-4" hx-target="this">
+		<div>
+			<label for="team-name" class="block text-gray-700 font-bold">Team Name</label>
+			<input type="text" id="team-name" name="team-name" required class="w-full mt-2 p-2 border border-gray-300 rounded"/>
+		</div>
+		<div>
+			<label for="team-description" class="block text-gray-700 font-bold">Team Description</label>
+			<textarea id="team-description" name="team-description" required class="w-full mt-2 p-2 border border-gray-300 rounded"></textarea>
+		</div>
+		<button type="submit" class="w-fit bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Team</button>
+	</form>
+}
+
+templ Team(teamId string, teamName string, teamDesc string, members []db.User) {
+	<div class="team-item p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm relative">
+		<div class="flex justify-between items-center">
+			<h3 class="text-xl font-medium text-gray-800">{ fmt.Sprint(teamName) }</h3>
+			<div class="relative">
+				<button hx-delete={ fmt.Sprintf("/teams/%s", teamId) } hx-target="#teams-list" hx-swap="outerHTML" class="p-1 rounded">
+					<span class="material-symbols-outlined text-red-600">delete</span>
+				</button>
+			</div>
+		</div>
+		<p class="text-gray-600 mb-4">{ fmt.Sprint(teamDesc) }</p>
+		<div class="team-members flex space-x-2">
+			for i := range members {
+				if i <= 2 {
+					<img class="w-8 h-8 rounded-full border-2 border-white" src="https://via.placeholder.com/32" alt="Member 1"/>
+				}
+			}
+			if len(members) > 3 {
+				<div class="w-8 h-8 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-gray-600 text-xs">{ fmt.Sprintf("+%d", len(members) - 3) }</div>
+			}
+		</div>
+	</div>
+}
+
+templ TeamsList(teams []db.Team) {
+	<div id="teams-list" class="space-y-4 max-h-[500px] overflow-y-scroll">
+		for _, team := range teams {
+			@Team(fmt.Sprint(team.ID), team.Name, fmt.Sprint(team.Description), team.Members)
+		}
+	</div>
 }
